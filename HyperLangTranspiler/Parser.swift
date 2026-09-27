@@ -86,7 +86,6 @@ public final class Parser {
     
     private func includeDeclaration() throws -> Decl {
         let keyword = previous()
-        // Safely consume any identifier token for the module path
         guard case .identifier = peek().type else {
             throw error(peek(), "Expected module identifier to include.")
         }
