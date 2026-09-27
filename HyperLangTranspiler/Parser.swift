@@ -1,283 +1,3 @@
-// MARK: - AST Nodes: Base Protocols
-
-public protocol ASTNode {
-    var span: SourceSpan { get }
-}
-
-public protocol Expr: ASTNode {}
-public protocol Stmt: ASTNode {}
-public protocol Decl: Stmt {}
-
-// MARK: - AST Nodes: Expressions
-
-public struct IdentifierExpr: Expr {
-    public let name: Token
-    public let span: SourceSpan
-}
-
-public struct LiteralExpr: Expr {
-    public let value: Token
-    public let span: SourceSpan
-}
-
-public struct BinaryExpr: Expr {
-    public let left: Expr
-    public let operatorToken: Token
-    public let right: Expr
-    public let span: SourceSpan
-}
-
-public struct UnaryExpr: Expr {
-    public let operatorToken: Token
-    public let right: Expr
-    public let span: SourceSpan
-}
-
-public struct LogicalExpr: Expr {
-    public let left: Expr
-    public let operatorToken: Token
-    public let right: Expr
-    public let span: SourceSpan
-}
-
-public struct CallExpr: Expr {
-    public let callee: Expr
-    public let paren: Token
-    public let arguments: [Expr]
-    public let span: SourceSpan
-}
-
-public struct MemberAccessExpr: Expr {
-    public let object: Expr
-    public let name: Token
-    public let span: SourceSpan
-}
-
-public struct AssignmentExpr: Expr {
-    public let name: Token
-    public let value: Expr
-    public let span: SourceSpan
-}
-
-public struct TryExpr: Expr {
-    public let tryKeyword: Token
-    public let expression: Expr
-    public let span: SourceSpan
-}
-
-public struct AwaitExpr: Expr {
-    public let awaitKeyword: Token
-    public let expression: Expr
-    public let span: SourceSpan
-}
-
-public struct CastExpr: Expr {
-    public let expression: Expr
-    public let asKeyword: Token
-    public let targetType: TypeExpr
-    public let span: SourceSpan
-}
-
-// MARK: - AST Nodes: Types
-
-public protocol TypeExpr: ASTNode {}
-
-public struct SimpleTypeExpr: TypeExpr {
-    public let name: Token
-    public let span: SourceSpan
-}
-
-public struct OptionalTypeExpr: TypeExpr {
-    public let baseType: TypeExpr
-    public let questionMark: Token
-    public let span: SourceSpan
-}
-
-// MARK: - AST Nodes: Statements
-
-public struct ExpressionStmt: Stmt {
-    public let expression: Expr
-    public let span: SourceSpan
-}
-
-public struct BlockStmt: Stmt {
-    public let statements: [Stmt]
-    public let span: SourceSpan
-}
-
-public struct IfStmt: Stmt {
-    public let condition: Expr
-    public let thenBranch: BlockStmt
-    public let elseBranch: Stmt?
-    public let span: SourceSpan
-}
-
-public struct WhileStmt: Stmt {
-    public let condition: Expr
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-public struct LoopStmt: Stmt {
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-public struct ForInStmt: Stmt {
-    public let iterator: Token
-    public let iterable: Expr
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-public struct WhenStmt: Stmt {
-    public let subject: Expr?
-    public let cases: [WhenCase]
-    public let defaultCase: BlockStmt?
-    public let span: SourceSpan
-}
-
-public struct WhenCase {
-    public let pattern: Expr
-    public let body: BlockStmt
-}
-
-public struct ReturnStmt: Stmt {
-    public let keyword: Token
-    public let value: Expr?
-    public let span: SourceSpan
-}
-
-public struct BreakStmt: Stmt {
-    public let keyword: Token
-    public let span: SourceSpan
-}
-
-public struct ContinueStmt: Stmt {
-    public let keyword: Token
-    public let span: SourceSpan
-}
-
-public struct PassStmt: Stmt {
-    public let keyword: Token
-    public let span: SourceSpan
-}
-
-public struct RaiseStmt: Stmt {
-    public let keyword: Token
-    public let value: Expr
-    public let span: SourceSpan
-}
-
-public struct SpawnStmt: Stmt {
-    public let keyword: Token
-    public let call: CallExpr
-    public let span: SourceSpan
-}
-
-public struct DeferStmt: Stmt {
-    public let keyword: Token
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-public struct GuardStmt: Stmt {
-    public let condition: Expr
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-// MARK: - AST Nodes: Declarations
-
-public struct ModuleDecl: Decl {
-    public let name: Token
-    public let span: SourceSpan
-}
-
-public struct IncludeDecl: Decl {
-    public let modulePath: Token
-    public let span: SourceSpan
-}
-
-public struct VarDecl: Decl {
-    public let keyword: Token
-    public let name: Token
-    public let typeAnnotation: TypeExpr?
-    public let initializer: Expr?
-    public let span: SourceSpan
-}
-
-public struct Parameter {
-    public let inoutModifier: Token?
-    public let name: Token
-    public let type: TypeExpr
-}
-
-public struct DefDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let parameters: [Parameter]
-    public let returnType: TypeExpr?
-    public let isAsync: Bool
-    public let isThrows: Bool
-    public let body: BlockStmt?
-    public let span: SourceSpan
-}
-
-public struct ClassDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let superclass: TypeExpr?
-    public let members: [Decl]
-    public let span: SourceSpan
-}
-
-public struct StructDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let members: [Decl]
-    public let span: SourceSpan
-}
-
-public struct InterfaceDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let members: [Decl] // Only signatures
-    public let span: SourceSpan
-}
-
-public struct ActorDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let members: [Decl]
-    public let span: SourceSpan
-}
-
-public struct EnumDecl: Decl {
-    public let modifiers: [Token]
-    public let name: Token
-    public let cases: [EnumCase]
-    public let span: SourceSpan
-}
-
-public struct EnumCase {
-    public let name: Token
-    public let associatedTypes: [TypeExpr]?
-}
-
-public struct InitDecl: Decl {
-    public let modifiers: [Token]
-    public let parameters: [Parameter]
-    public let isThrows: Bool
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
-public struct DeinitDecl: Decl {
-    public let body: BlockStmt
-    public let span: SourceSpan
-}
-
 // MARK: - Parser Errors
 
 public enum ParserError: Error, CustomStringConvertible {
@@ -366,7 +86,11 @@ public final class Parser {
     
     private func includeDeclaration() throws -> Decl {
         let keyword = previous()
-        let path = try consume(.identifier(""), "Expected module identifier to include.")
+        // Safely consume any identifier token for the module path
+        guard case .identifier = peek().type else {
+            throw error(peek(), "Expected module identifier to include.")
+        }
+        let path = advance()
         return IncludeDecl(modulePath: path, span: expandSpan(keyword, path))
     }
     
@@ -519,10 +243,7 @@ public final class Parser {
     // MARK: - Statements
     
     private func statementAsDecl() throws -> Decl {
-        // Fallback for statements in root
         let stmt = try statement()
-        // Wrap statement in an ad-hoc Decl if required, or error.
-        // For simplicity in this parser, we assume Stmt can masquerade as Decl via a wrapper.
         struct StmtDeclWrapper: Decl {
             let stmt: Stmt
             var span: SourceSpan { stmt.span }
@@ -720,7 +441,6 @@ public final class Parser {
             if let varExpr = expr as? IdentifierExpr {
                 return AssignmentExpr(name: varExpr.name, value: value, span: expandSpan(expr.span, value.span))
             } else if let getExpr = expr as? MemberAccessExpr {
-                // Not standard assignment struct, but conceptually valid for AST
                 return AssignmentExpr(name: getExpr.name, value: value, span: expandSpan(expr.span, value.span))
             }
             throw error(equals, "Invalid assignment target.")
@@ -769,7 +489,6 @@ public final class Parser {
         if match(.keywordIs) {
             let isTok = previous()
             let typeNode = try parseType()
-            // Using CastExpr structure slightly bent for 'is'
             expr = CastExpr(expression: expr, asKeyword: isTok, targetType: typeNode, span: expandSpan(expr.span, previous().span))
         }
         return expr
@@ -839,7 +558,6 @@ public final class Parser {
                 if arguments.count >= 255 {
                     _ = error(peek(), "Cannot have more than 255 arguments.")
                 }
-                // allow arg label checking here in a deeper implementation
                 arguments.append(try expression())
             } while match(.comma)
         }
@@ -853,7 +571,6 @@ public final class Parser {
         if match(.keywordNone) { return LiteralExpr(value: previous(), span: previous().span) }
         
         if match(.integerLiteral(0), .floatLiteral(0.0), .stringLiteral("")) {
-            // Slight hack to match generic literal tokens
             return LiteralExpr(value: previous(), span: previous().span)
         }
         
@@ -920,7 +637,6 @@ public final class Parser {
     private func check(_ type: TokenType) -> Bool {
         if isAtEnd() { return false }
         
-        // Complex matching required for enums with payloads
         switch (peek().type, type) {
         case (.identifier, .identifier): return true
         case (.stringLiteral, .stringLiteral): return true
