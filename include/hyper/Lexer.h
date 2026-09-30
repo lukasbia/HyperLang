@@ -369,6 +369,7 @@ private:
     static bool looksLikeEditorPlaceholder(std::string_view text) noexcept;
     static bool looksLikeDirective(std::string_view text) noexcept;
     static bool looksLikeConflictMarker(std::string_view text) noexcept;
+    static bool isEscapedIdentifierEntirelyWhitespace(std::string_view text);
 
     Token lexUnknown();
 
