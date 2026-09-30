@@ -20,6 +20,9 @@ struct LexerDiagnostic {
     SourceLocation* location = nullptr;
     std::string message;
     std::string replacement;
+    std::string category;
+    std::size_t offset = 0;
+    std::size_t length = 0;
 };
 
 class LexerSupport {
@@ -32,9 +35,12 @@ public:
     static bool isComment(std::string_view text) noexcept;
     static bool isDirective(std::string_view text) noexcept;
     static bool isEditorPlaceholder(std::string_view text) noexcept;
+    static bool isDocumentationComment(std::string_view text) noexcept;
+    static bool isCompilerDirective(std::string_view text) noexcept;
     static std::size_t indentationWidth(std::string_view text) noexcept;
     static std::string normalizeIdentifier(std::string_view text);
     static std::string unescapeIdentifier(std::string_view text);
+    static std::string stripCommentMarkers(std::string_view text);
 };
 
 } // namespace hyper
