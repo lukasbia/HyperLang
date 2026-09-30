@@ -4,6 +4,7 @@
 #include "hyperlang/HIL/HIL.h"
 #include "hyperlang/MCM/MCM.h"
 #include "hyperlang/Sema/Sema.h"
+#include <utility>
 namespace hyperlang::lsc {
 void LiveCompiler::synchronize(const hil::Module& module){snapshot_.module=module;++snapshot_.revision;if(callback_)callback_(snapshot_);}
 void LiveCompiler::setUpdateCallback(UpdateCallback callback){callback_=std::move(callback);}
