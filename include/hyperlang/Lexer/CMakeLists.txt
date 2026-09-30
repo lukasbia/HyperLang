@@ -1,2 +1,0 @@
-add_library(HyperLangLexerHeaders INTERFACE)
-target_include_directories(HyperLangLexerHeaders INTERFACE ${PROJECT_SOURCE_DIR}/include)
