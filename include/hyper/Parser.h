@@ -9,8 +9,12 @@
 #include <vector>
 
 #include "hyper/Lexer.h"
+
+#include "hyper/Parse/Confusables.h"
 #include "hyper/Parse/ParserCore.h"
 #include "hyper/Parse/ParserDecl.h"
+#include "hyper/Parse/ParserDeclName.h"
+#include "hyper/Parse/ParserDiagnostics.h"
 #include "hyper/Parse/ParserExpr.h"
 #include "hyper/Parse/ParserGeneric.h"
 #include "hyper/Parse/ParserIfConfig.h"
