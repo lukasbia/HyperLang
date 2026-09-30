@@ -1,6 +1,7 @@
 #pragma once
 
 #include "hyper/Parse/ParserCore.h"
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -10,6 +11,7 @@ struct ParserCheckpoint {
     ParserCursor cursor;
     ParseMode mode = ParseMode::SourceFile;
     std::size_t diagnosticCount = 0;
+    std::size_t scopeDepth = 0;
 };
 
 class PersistentParserState {
@@ -18,13 +20,21 @@ public:
 
     ParserCheckpoint checkpoint() const;
     void restore(const ParserCheckpoint& checkpoint);
+    void reset();
 
     void pushScope(std::string name);
     void popScope();
     const std::vector<std::string>& scopes() const;
+    bool hasScope(std::string_view name) const;
 
     void setMode(ParseMode mode);
     ParseMode mode() const;
+
+    void setCursor(ParserCursor cursor);
+    ParserCursor cursor() const;
+
+    void setDiagnosticCount(std::size_t count);
+    std::size_t diagnosticCount() const;
 
 private:
     ParserCursor cursor_;
