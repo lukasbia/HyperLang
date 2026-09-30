@@ -1,57 +1,40 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <string>
 #include <string_view>
 
 namespace hyper {
 
 struct SourceLocation;
-enum class NumberBase : std::uint8_t;
-enum class StringKind : std::uint8_t;
-enum class TokenKind;
-enum class OperatorBinding;
+struct Token;
 
-struct LexerRange {
-    std::size_t begin = 0;
-    std::size_t end = 0;
-    constexpr std::size_t size() const noexcept {
-        return end >= begin ? end - begin : 0;
-    }
-};
-
-struct NumericLiteralInfo {
-    NumberBase base;
-    bool hasDecimalPoint = false;
-    bool hasExponent = false;
-    bool exponentIsBinary = false;
-    bool hasSeparators = false;
-    bool hasLeadingZero = false;
-    bool hasSuffix = false;
-};
-
-struct StringLiteralInfo {
-    StringKind kind;
-    unsigned customDelimiterLength = 0;
-    bool hasInterpolation = false;
-    bool hasEscapes = false;
-    bool terminated = true;
+enum class LexerDiagnosticSeverity {
+    Note,
+    Warning,
+    Error
 };
 
 struct LexerDiagnostic {
-    enum class Severity {
-        Note,
-        Warning,
-        Error
-    };
-    Severity severity = Severity::Error;
-    SourceLocation location;
+    LexerDiagnosticSeverity severity = LexerDiagnosticSeverity::Error;
+    SourceLocation* location = nullptr;
     std::string message;
     std::string replacement;
 };
 
-const char* tokenKindName(TokenKind) noexcept;
-const char* operatorBindingName(OperatorBinding) noexcept;
+class LexerSupport {
+public:
+    static bool isIdentifierStart(std::string_view text) noexcept;
+    static bool isIdentifierContinue(std::string_view text) noexcept;
+    static bool isOperator(std::string_view text) noexcept;
+    static bool isWhitespace(std::string_view text) noexcept;
+    static bool isLineBreak(std::string_view text) noexcept;
+    static bool isComment(std::string_view text) noexcept;
+    static bool isDirective(std::string_view text) noexcept;
+    static bool isEditorPlaceholder(std::string_view text) noexcept;
+    static std::size_t indentationWidth(std::string_view text) noexcept;
+    static std::string normalizeIdentifier(std::string_view text);
+    static std::string unescapeIdentifier(std::string_view text);
+};
 
 } // namespace hyper
