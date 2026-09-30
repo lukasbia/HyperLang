@@ -1,8 +1,0 @@
-add_library(HyperLangFoundation INTERFACE)
-target_include_directories(HyperLangFoundation INTERFACE ${PROJECT_SOURCE_DIR}/libraries/Foundation/include)
-add_library(HyperLangDecimal INTERFACE)
-target_include_directories(HyperLangDecimal INTERFACE ${PROJECT_SOURCE_DIR}/libraries/Decimal/include)
-add_library(HyperLangDataScience INTERFACE)
-target_include_directories(HyperLangDataScience INTERFACE ${PROJECT_SOURCE_DIR}/libraries/DataScience/include)
-add_library(HyperLangHyperUi INTERFACE)
-target_include_directories(HyperLangHyperUi INTERFACE ${PROJECT_SOURCE_DIR}/libraries/HyperUi/include)
