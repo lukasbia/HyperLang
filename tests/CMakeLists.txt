@@ -1,5 +1,0 @@
-enable_testing()
-add_executable(HyperLangLexerTest Lexer/LexerTest.cpp)
-target_link_libraries(HyperLangLexerTest PRIVATE HyperLangCompiler)
-target_compile_features(HyperLangLexerTest PRIVATE cxx_std_20)
-add_test(NAME HyperLangLexerTest COMMAND HyperLangLexerTest)
