@@ -25,6 +25,9 @@ public:
     static std::uint32_t decodeUTF8(std::string_view source, std::size_t& offset) noexcept;
     static bool encodeUTF8(std::uint32_t codePoint, std::string& output);
     static bool validateUTF8(std::string_view source) noexcept;
+    static std::size_t characterWidth(std::string_view source, std::size_t offset) noexcept;
+    static bool isLineBreak(std::string_view source, std::size_t offset) noexcept;
+    static bool isWhitespace(std::string_view source, std::size_t offset) noexcept;
 };
 
 } // namespace hyper
