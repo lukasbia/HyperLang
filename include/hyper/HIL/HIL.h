@@ -88,4 +88,21 @@ std::size_t basicBlockCount(const Module&) noexcept;
 std::size_t functionCount(const Module&) noexcept;
 std::size_t operandCount(const Instruction&) noexcept;
 
+// Feature-specific HIL analyses. These operate on the actual HIL graph instead of
+// serving as empty registration units.
+bool analyzeActors(const Module&) noexcept;
+bool analyzeArrays(const Module&) noexcept;
+bool analyzeAsync(const Module&) noexcept;
+bool analyzeClasses(const Module&) noexcept;
+bool analyzeClosures(const Module&) noexcept;
+bool analyzeDebugMetadata(const Module&) noexcept;
+bool analyzeEnums(const Module&) noexcept;
+bool analyzeExistentials(const Module&) noexcept;
+bool analyzeGenerics(const Module&) noexcept;
+bool analyzeHILParserOutput(const Module&) noexcept;
+bool analyzeProtocols(const Module&) noexcept;
+std::string serializeModule(const Module&);
+bool analyzeStructs(const Module&) noexcept;
+bool analyzeTuples(const Module&) noexcept;
+
 } // namespace hyper::hil
