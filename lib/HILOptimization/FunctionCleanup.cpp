@@ -1,7 +1,7 @@
 #include "hyperlang/HIL/Optimization/OptimizationUtils.h"
-#include <algorithm>
+#include <cstddef>
 
-namespace hyperlang::hil::optimization {
+namespace hyperlang::hil {
 
 bool runFunctionCleanup(Module& module) {
     bool changed = false;
@@ -26,13 +26,14 @@ bool runFunctionCleanup(Module& module) {
         }
 
         for (std::size_t i = 1; i + 1 < list.size(); ++i) {
-            if (list[i].opcode != Opcode::Return && list[i].opcode != Opcode::Branch &&
-                list[i].opcode != Opcode::BranchIf) continue;
-            auto end = std::find(list.begin() + static_cast<std::ptrdiff_t>(i + 1), list.end(),
-                                 Instruction{Opcode::FunctionEnd, function.name});
-            if (end == list.end()) break;
-            if (end != list.begin() + static_cast<std::ptrdiff_t>(i + 1)) {
-                list.erase(list.begin() + static_cast<std::ptrdiff_t>(i + 1), end);
+            const auto opcode = list[i].opcode;
+            if (opcode != Opcode::Return && opcode != Opcode::Branch && opcode != Opcode::BranchIf) continue;
+
+            std::size_t end = i + 1;
+            while (end < list.size() && list[end].opcode != Opcode::FunctionEnd) ++end;
+            if (end > i + 1) {
+                list.erase(list.begin() + static_cast<std::ptrdiff_t>(i + 1),
+                           list.begin() + static_cast<std::ptrdiff_t>(end));
                 changed = true;
             }
             break;
@@ -42,4 +43,4 @@ bool runFunctionCleanup(Module& module) {
     return changed;
 }
 
-} // namespace hyperlang::hil::optimization
+} // namespace hyperlang::hil
