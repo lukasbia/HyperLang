@@ -55,6 +55,17 @@ public:
     std::unique_ptr<SyntaxNode> parsePattern();
     std::unique_ptr<SyntaxNode> parseGenericClause();
 
+    std::unique_ptr<SyntaxNode> parseImportDeclaration();
+    std::unique_ptr<SyntaxNode> parseFunctionDeclaration();
+    std::unique_ptr<SyntaxNode> parseVariableDeclaration();
+    std::unique_ptr<SyntaxNode> parseTypeDeclaration();
+    std::unique_ptr<SyntaxNode> parseCompoundStatement();
+    std::unique_ptr<SyntaxNode> parseIfStatement();
+    std::unique_ptr<SyntaxNode> parseWhileStatement();
+    std::unique_ptr<SyntaxNode> parseForStatement();
+    std::unique_ptr<SyntaxNode> parseSwitchStatement();
+    std::unique_ptr<SyntaxNode> parseReturnStatement();
+
 private:
     struct Implementation;
     std::unique_ptr<Implementation> implementation_;
