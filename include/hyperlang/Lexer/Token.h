@@ -151,7 +151,17 @@ enum class TokenKind : std::uint16_t {
     Observe,
     Synchronize,
     Compile,
-    Extern
+    Extern,
+
+    // Compatibility aliases used while the frontend is being migrated to the new token model.
+    AndAnd = And,
+    OrOr = Or,
+    Bang = Not,
+    Struct = Module,
+    Protocol = Module,
+    Extension = Module,
+    Typealias = Module,
+    Class = Module
 };
 
 struct SourceLocation {
