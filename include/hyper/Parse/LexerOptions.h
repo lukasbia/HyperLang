@@ -19,7 +19,15 @@ struct LexerOptions {
     bool recoverMalformedTokens = true;
     bool preserveWhitespace = false;
     bool preserveNewlines = false;
+    bool emitEndOfFileToken = true;
+    bool emitTriviaTokens = false;
+    bool recognizeDocumentationComments = true;
+    bool recognizeCompilerDirectives = true;
+    bool recognizeEditorPlaceholders = true;
+    bool recognizeAttributeNames = true;
     std::size_t maximumLookahead = 256;
+    std::size_t maximumTokenLength = 1024 * 1024;
+    std::size_t maximumDiagnosticCount = 256;
 };
 
 } // namespace hyper
