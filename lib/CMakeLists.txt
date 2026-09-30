@@ -6,6 +6,21 @@ add_library(HyperLangCompiler
     Sema/Sema.cpp
     HIL/HIL.cpp
     HIL/Optimization/HILOptimizer.cpp
+    HILOptimization/OptimizationUtils.cpp
+    HILOptimization/ConstantFolding.cpp
+    HILOptimization/ConstantPropagation.cpp
+    HILOptimization/CopyPropagation.cpp
+    HILOptimization/AlgebraicSimplification.cpp
+    HILOptimization/CommonSubexpressionElimination.cpp
+    HILOptimization/DeadCodeElimination.cpp
+    HILOptimization/BranchSimplification.cpp
+    HILOptimization/Peephole.cpp
+    HILOptimization/LoadStoreSimplification.cpp
+    HILOptimization/StrengthReduction.cpp
+    HILOptimization/CompareSimplification.cpp
+    HILOptimization/InstructionCombining.cpp
+    HILOptimization/RedundantMoveElimination.cpp
+    HILOptimization/FunctionCleanup.cpp
     LSC/LSC.cpp
     LSC/Optimization/LSCOptimizer.cpp
     LSC/Backend/LSCMachineCode.cpp
