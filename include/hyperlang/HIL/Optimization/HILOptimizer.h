@@ -10,17 +10,25 @@ namespace hyperlang::hil {
 struct OptimizationOptions {
     bool constantFolding = true;
     bool constantPropagation = true;
+    bool sparseConditionalConstantPropagation = true;
     bool copyPropagation = true;
     bool algebraicSimplification = true;
     bool commonSubexpressionElimination = true;
+    bool localValueNumbering = true;
     bool deadCodeElimination = true;
+    bool deadStoreElimination = true;
+    bool storeForwarding = true;
+    bool redundantLoadElimination = true;
     bool branchSimplification = true;
+    bool simplifyCFG = true;
     bool peephole = true;
     bool loadStoreSimplification = true;
     bool strengthReduction = true;
     bool compareSimplification = true;
+    bool compareConstantFolding = true;
     bool instructionCombining = true;
     bool redundantMoveElimination = true;
+    bool literalCanonicalization = true;
     bool functionCleanup = true;
 };
 
@@ -32,17 +40,25 @@ struct OptimizationStats {
 
 bool runConstantFolding(Module& module);
 bool runConstantPropagation(Module& module);
+bool runSparseConditionalConstantPropagation(Module& module);
 bool runCopyPropagation(Module& module);
 bool runAlgebraicSimplification(Module& module);
 bool runCommonSubexpressionElimination(Module& module);
+bool runLocalValueNumbering(Module& module);
 bool runDeadCodeElimination(Module& module);
+bool runDeadStoreElimination(Module& module);
+bool runStoreForwarding(Module& module);
+bool runRedundantLoadElimination(Module& module);
 bool runBranchSimplification(Module& module);
+bool runSimplifyCFG(Module& module);
 bool runPeephole(Module& module);
 bool runLoadStoreSimplification(Module& module);
 bool runStrengthReduction(Module& module);
 bool runCompareSimplification(Module& module);
+bool runCompareConstantFolding(Module& module);
 bool runInstructionCombining(Module& module);
 bool runRedundantMoveElimination(Module& module);
+bool runLiteralCanonicalization(Module& module);
 bool runFunctionCleanup(Module& module);
 
 OptimizationStats optimizeModule(Module& module, const OptimizationOptions& options = {});
