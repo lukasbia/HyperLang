@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hyper/Parser.h"
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -20,6 +22,15 @@ struct GenericRequirementSyntax {
 struct GenericClauseSyntax {
     std::vector<GenericParameterSyntax> parameters;
     std::vector<GenericRequirementSyntax> requirements;
+};
+
+class GenericParser {
+public:
+    static std::unique_ptr<SyntaxNode> parseClause(Parser& parser);
+    static std::unique_ptr<SyntaxNode> parseParameter(Parser& parser);
+    static std::unique_ptr<SyntaxNode> parseRequirement(Parser& parser);
+    static std::unique_ptr<SyntaxNode> parseArgumentList(Parser& parser);
+    static bool startsGenericClause(const Parser& parser);
 };
 
 } // namespace hyper::parse
