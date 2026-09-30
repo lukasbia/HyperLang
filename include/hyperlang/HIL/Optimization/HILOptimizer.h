@@ -38,6 +38,35 @@ struct OptimizationStats {
     std::vector<std::string> changedPasses;
 };
 
+struct CFGSummary {
+    std::size_t branchCount = 0;
+    std::size_t conditionalBranchCount = 0;
+    std::size_t terminatorCount = 0;
+    bool structurallyValid = true;
+};
+
+struct LoopSummary {
+    std::size_t branchBackedgeCandidates = 0;
+    bool hasLoopCandidate = false;
+};
+
+struct AliasSummary {
+    std::size_t loadCount = 0;
+    std::size_t storeCount = 0;
+    std::size_t exactVariableMatches = 0;
+};
+
+struct RangeSummary {
+    bool hasIntegerLiterals = false;
+    long long minimum = 0;
+    long long maximum = 0;
+};
+
+struct CostSummary {
+    std::size_t instructionCount = 0;
+    std::size_t estimatedCost = 0;
+};
+
 bool runConstantFolding(Module& module);
 bool runConstantPropagation(Module& module);
 bool runSparseConditionalConstantPropagation(Module& module);
@@ -60,6 +89,13 @@ bool runInstructionCombining(Module& module);
 bool runRedundantMoveElimination(Module& module);
 bool runLiteralCanonicalization(Module& module);
 bool runFunctionCleanup(Module& module);
+
+CFGSummary analyzeCFG(const Module& module);
+LoopSummary analyzeLoops(const Module& module);
+AliasSummary analyzeAliases(const Module& module);
+RangeSummary analyzeRanges(const Module& module);
+CostSummary estimateOptimizationCost(const Module& module);
+bool verifyOptimizedModule(const Module& module, std::string* error = nullptr);
 
 OptimizationStats optimizeModule(Module& module, const OptimizationOptions& options = {});
 void runOptimization(Module& module);
