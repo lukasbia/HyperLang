@@ -9,22 +9,8 @@
 namespace hyper::llcvm {
 
 enum class Opcode : std::uint16_t {
-    Invalid,
-    Constant,
-    Move,
-    Load,
-    Store,
-    Add,
-    Sub,
-    Mul,
-    Div,
-    Compare,
-    Branch,
-    Call,
-    Return,
-    Retain,
-    Release,
-    Trap
+    Invalid, Constant, Move, Load, Store, Add, Sub, Mul, Div, Compare,
+    Branch, Call, Return, Retain, Release, Trap
 };
 
 struct SourceLocation {
@@ -43,18 +29,27 @@ struct CompiledLine {
     std::size_t sourceLine = 0;
     std::string source;
     std::vector<Instruction> instructions;
+    std::uint64_t generation = 0;
 };
 
 class Module {
 public:
     explicit Module(std::string name = {});
-    void updateLine(CompiledLine line);
+    bool updateLine(CompiledLine line);
+    bool removeLine(std::size_t sourceLine);
+    const CompiledLine* findLine(std::size_t sourceLine) const noexcept;
     const std::string& name() const noexcept;
     const std::vector<CompiledLine>& lines() const noexcept;
+    std::uint64_t generation() const noexcept;
 
 private:
     std::string name_;
     std::vector<CompiledLine> lines_;
+    std::uint64_t generation_ = 0;
 };
+
+const char* opcodeName(Opcode) noexcept;
+bool isTerminator(Opcode) noexcept;
+bool isPure(Opcode) noexcept;
 
 } // namespace hyper::llcvm
