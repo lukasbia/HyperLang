@@ -5,6 +5,7 @@
 #include "hyperlang/HIL/HIL.h"
 #include "hyperlang/LSC/LSC.h"
 #include "hyperlang/MCM/MCM.h"
+#include "hyperlang/CodeGen/CodeGen.h"
 #include <fstream>
 #include <sstream>
 
@@ -20,17 +21,27 @@ int Driver::run(const std::string& inputPath, const DriverOptions& options) {
 int Driver::compileSource(const std::string& source, const DriverOptions& options) {
     lexer::Lexer lexer(source);
     auto tokens = lexer.tokenize();
-    parser::Parser parser(tokens);
+
+    parser::Parser parser(std::move(tokens));
     auto tree = parser.parse();
-    sema::Sema sema;
-    if (!sema.check(tree)) return 1;
-    hil::Module module = hil::lower(tree);
+    if (!tree) return 1;
+
+    sema::Analyzer sema;
+    if (!sema.analyze(*tree)) return 1;
+
+    hil::Module module = hil::lower(*tree);
     if (options.optimize) hil::optimize(module);
+
     mcm::insertOwnershipOperations(module);
+
+    lsc::LiveCompiler liveCompiler;
+    liveCompiler.synchronize(module);
+
     lsc::IR ir = lsc::lower(module);
     if (options.optimize) lsc::optimize(ir);
+
     lsc::MachineCode machine = lsc::generateMachineCode(ir);
-    lsc::emit(machine);
+    codegen::emit(machine);
     return 0;
 }
 }
