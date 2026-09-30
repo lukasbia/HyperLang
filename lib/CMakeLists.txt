@@ -1,8 +1,8 @@
 add_library(HyperLangCompiler
     Driver/Driver.cpp
-    Lexer/Lexer.cpp
+    Parse/Lexer/Lexer.cpp
     Lexer/Token.cpp
-    Parser/Parser.cpp
+    Parse/Parser/Parser.cpp
     Sema/Sema.cpp
     HIL/HIL.cpp
     HIL/Optimization/HILOptimizer.cpp
@@ -12,6 +12,7 @@ add_library(HyperLangCompiler
     CodeGen/CodeGen.cpp
     Diagnostics/DiagnosticEngine.cpp
     Support/SourceManager.cpp
+    MCM/MCM.cpp
 )
 
 target_include_directories(HyperLangCompiler PUBLIC ${PROJECT_SOURCE_DIR}/include)
