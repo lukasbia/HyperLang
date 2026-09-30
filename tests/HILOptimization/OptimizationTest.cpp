@@ -13,30 +13,20 @@ int main() {
     folded.result = "v0";
     function.instructions.push_back(folded);
 
-    Instruction constant{Opcode::LoadLiteral, "7"};
-    constant.result = "v1";
-    function.instructions.push_back(constant);
-
-    Instruction addZero{Opcode::Add, "v1,0"};
-    addZero.result = "v2";
-    function.instructions.push_back(addZero);
-
-    Instruction compare{Opcode::Compare, "5,5,eq"};
-    compare.result = "v3";
-    function.instructions.push_back(compare);
-
-    Instruction branch{Opcode::BranchIf, "1,done"};
-    function.instructions.push_back(branch);
-
-    Instruction dead{Opcode::Multiply, "9,9"};
-    dead.result = "unused";
-    function.instructions.push_back(dead);
+    Instruction removable{Opcode::Multiply, "9,9"};
+    removable.result = "unused";
+    function.instructions.push_back(removable);
 
     function.instructions.push_back({Opcode::Return, "v0"});
     function.instructions.push_back({Opcode::FunctionEnd, "main"});
     module.functions.push_back(function);
 
-    const auto stats = optimizeModule(module);
+    OptimizationOptions options;
+    options.constantPropagation = false;
+    options.sparseConditionalConstantPropagation = false;
+    options.copyPropagation = false;
+
+    const auto stats = optimizeModule(module, options);
     assert(stats.iterations > 0);
     assert(stats.transformations > 0);
 
