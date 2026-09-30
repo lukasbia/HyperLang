@@ -1,8 +1,0 @@
-add_library(HyperLangParserStage OBJECT Parser.cpp)
-target_include_directories(HyperLangParserStage PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_compile_features(HyperLangParserStage PUBLIC cxx_std_20)
-if(MSVC)
-    target_compile_options(HyperLangParserStage PRIVATE /W4 /O2)
-else()
-    target_compile_options(HyperLangParserStage PRIVATE -Wall -Wextra -Wpedantic -O2)
-endif()

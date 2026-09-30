@@ -1,8 +1,0 @@
-add_library(HyperLangLexerStage OBJECT Lexer.cpp Token.cpp)
-target_include_directories(HyperLangLexerStage PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_compile_features(HyperLangLexerStage PUBLIC cxx_std_20)
-if(MSVC)
-    target_compile_options(HyperLangLexerStage PRIVATE /W4 /O2)
-else()
-    target_compile_options(HyperLangLexerStage PRIVATE -Wall -Wextra -Wpedantic -O2)
-endif()
