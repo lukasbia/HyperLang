@@ -6,10 +6,10 @@
 #include <string_view>
 #include <vector>
 
-#include "hyper/Parse/LexerOptions.h"
 #include "hyper/Parse/LexerCharacter.h"
-#include "hyper/Parse/LexerToken.h"
+#include "hyper/Parse/LexerOptions.h"
 #include "hyper/Parse/LexerSupport.h"
+#include "hyper/Parse/LexerToken.h"
 
 namespace hyper {
 
@@ -60,9 +60,16 @@ private:
     bool consumeLineComment();
     bool consumeBlockComment();
     bool consumeHashbang();
-    void diagnose(LexerDiagnostic::Severity severity, SourceLocation location, std::string message);
+
+    void diagnose(
+        LexerDiagnosticSeverity severity,
+        SourceLocation location,
+        std::string message
+    );
 };
 
-const char* tokenKindName(TokenKind kind) noexcept;
+const char* tokenKindName(
+    TokenKind kind
+) noexcept;
 
 } // namespace hyper
