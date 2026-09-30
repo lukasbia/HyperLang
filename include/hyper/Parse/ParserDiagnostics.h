@@ -1,38 +1,45 @@
 #pragma once
 
-#include "hyper/Parser.h"
+#include <cstddef>
 #include <string>
-#include <string_view>
 #include <vector>
 
-namespace hyper::parse {
+namespace hyper {
 
-struct ParserDiagnostic {
+struct SourceLocation;
+
+struct ParseDiagnostic {
     enum class Severity {
         Note,
         Warning,
-        Error,
-        Fatal
+        Error
     };
 
     Severity severity = Severity::Error;
-    SourceLocation location{};
+    SourceLocation* location = nullptr;
     std::string message;
     std::string fixIt;
+    std::vector<std::string> notes;
 };
 
-class ParserDiagnosticEngine {
+class ParserDiagnostics {
 public:
-    void note(SourceLocation location, std::string message);
-    void warning(SourceLocation location, std::string message);
-    void error(SourceLocation location, std::string message);
-    void fatal(SourceLocation location, std::string message);
+    void note(std::string message);
+    void warning(std::string message);
+    void error(std::string message);
+
+    void add(ParseDiagnostic diagnostic);
     void clear();
-    bool hasError() const noexcept;
-    const std::vector<ParserDiagnostic>& diagnostics() const noexcept;
+
+    bool empty() const noexcept;
+    bool hasErrors() const noexcept;
+    std::size_t size() const noexcept;
+
+    const std::vector<ParseDiagnostic>& all() const noexcept;
+    std::vector<ParseDiagnostic>& all() noexcept;
 
 private:
-    std::vector<ParserDiagnostic> diagnostics_;
+    std::vector<ParseDiagnostic> diagnostics_;
 };
 
-} // namespace hyper::parse
+} // namespace hyper
