@@ -9,23 +9,21 @@
 namespace hyperlang::lexer {
 static const std::unordered_map<std::string,TokenKind> keywords={
  {"func",TokenKind::Func},{"else",TokenKind::Else},{"if",TokenKind::If},{"then",TokenKind::Then},{"endif",TokenKind::EndIf},{"while",TokenKind::While},
- {"true",TokenKind::True},{"false",TokenKind::False},{"do",TokenKind::Do},{"loop",TokenKind::Loop},{"endLoop",TokenKind::EndLoop},{"let",TokenKind::Let},
- {"var",TokenKind::Var},{"string",TokenKind::String},{"panic",TokenKind::Panic},{"input",TokenKind::Input},{"output",TokenKind::Output},{"init",TokenKind::Init},
- {"deinit",TokenKind::Deinit},{"int",TokenKind::Int},{"num",TokenKind::Num},{"enum",TokenKind::Enum},{"nil",TokenKind::Nil},{"class",TokenKind::Class},
- {"struct",TokenKind::Struct},{"protocol",TokenKind::Protocol},{"extension",TokenKind::Extension},{"typealias",TokenKind::Typealias},{"guard",TokenKind::Guard},
- {"switch",TokenKind::Switch},{"case",TokenKind::Case},{"default",TokenKind::Default},{"for",TokenKind::For},{"in",TokenKind::In},{"break",TokenKind::Break},
- {"continue",TokenKind::Continue},{"return",TokenKind::Return},{"defer",TokenKind::Defer},{"throw",TokenKind::Throw},{"throws",TokenKind::Throws},
- {"catch",TokenKind::Catch},{"async",TokenKind::Async},{"await",TokenKind::Await},{"some",TokenKind::Some},{"any",TokenKind::Any},{"self",TokenKind::Self},
- {"where",TokenKind::Where},{"get",TokenKind::Get},{"set",TokenKind::Set},{"mutating",TokenKind::Mutating},{"static",TokenKind::Static},{"final",TokenKind::Final},
- {"private",TokenKind::Private},{"public",TokenKind::Public},{"internal",TokenKind::Internal},{"operator",TokenKind::Operator},{"subscript",TokenKind::Subscript},
- {"associatedtype",TokenKind::AssociatedType},{"required",TokenKind::Required},{"convenience",TokenKind::Convenience},{"override",TokenKind::Override},
- {"weak",TokenKind::Weak},{"unowned",TokenKind::Unowned},{"borrow",TokenKind::Borrow},{"consume",TokenKind::Consume},{"yield",TokenKind::Yield},
- {"macro",TokenKind::Macro},{"attribute",TokenKind::Attribute}
+ {"true",TokenKind::True},{"false",TokenKind::False},{"do",TokenKind::Do},{"loop",TokenKind::Loop},{"endLoop",TokenKind::EndLoop},{"let",TokenKind::Let},{"var",TokenKind::Var},{"string",TokenKind::String},
+ {"panic",TokenKind::Panic},{"input",TokenKind::Input},{"output",TokenKind::Output},{"init",TokenKind::Init},{"deinit",TokenKind::Deinit},{"int",TokenKind::Int},{"num",TokenKind::Num},{"enum",TokenKind::Enum},{"nil",TokenKind::Nil},
+ {"class",TokenKind::Class},{"struct",TokenKind::Struct},{"protocol",TokenKind::Protocol},{"extension",TokenKind::Extension},{"typealias",TokenKind::Typealias},{"guard",TokenKind::Guard},{"switch",TokenKind::Switch},{"case",TokenKind::Case},{"default",TokenKind::Default},
+ {"for",TokenKind::For},{"in",TokenKind::In},{"break",TokenKind::Break},{"continue",TokenKind::Continue},{"return",TokenKind::Return},{"defer",TokenKind::Defer},{"throw",TokenKind::Throw},{"throws",TokenKind::Throws},{"catch",TokenKind::Catch},
+ {"async",TokenKind::Async},{"await",TokenKind::Await},{"some",TokenKind::Some},{"any",TokenKind::Any},{"self",TokenKind::Self},{"where",TokenKind::Where},{"get",TokenKind::Get},{"set",TokenKind::Set},{"mutating",TokenKind::Mutating},{"static",TokenKind::Static},{"final",TokenKind::Final},
+ {"private",TokenKind::Private},{"public",TokenKind::Public},{"internal",TokenKind::Internal},{"operator",TokenKind::Operator},{"subscript",TokenKind::Subscript},{"associatedtype",TokenKind::AssociatedType},{"required",TokenKind::Required},{"convenience",TokenKind::Convenience},{"override",TokenKind::Override},
+ {"weak",TokenKind::Weak},{"unowned",TokenKind::Unowned},{"borrow",TokenKind::Borrow},{"consume",TokenKind::Consume},{"yield",TokenKind::Yield},{"macro",TokenKind::Macro},{"attribute",TokenKind::Attribute},
+ {"module",TokenKind::Module},{"package",TokenKind::Package},{"namespace",TokenKind::Namespace},{"source",TokenKind::Source},{"file",TokenKind::File},{"function",TokenKind::Function},{"property",TokenKind::Property},{"event",TokenKind::Event},{"signal",TokenKind::Signal},
+ {"asynclet",TokenKind::AsyncLet},{"actor",TokenKind::Actor},{"task",TokenKind::Task},{"detach",TokenKind::Detach},{"isolated",TokenKind::Isolated},{"nonisolated",TokenKind::Nonisolated},{"sendable",TokenKind::Sendable},{"move",TokenKind::Move},{"copy",TokenKind::Copy},
+ {"weakref",TokenKind::WeakRef},{"strongref",TokenKind::StrongRef},{"own",TokenKind::Own},{"shared",TokenKind::Shared},{"observe",TokenKind::Observe},{"synchronize",TokenKind::Synchronize},{"compile",TokenKind::Compile},{"extern",TokenKind::Extern}
 };
 Lexer::Lexer(std::string_view s):source_(s){}
-char Lexer::peek(std::size_t n)const{return index_+n<source_.size()?source_[index_+n]: '\0';}
-char Lexer::advance(){char c=peek(); if(c){++index_; if(c=='\n'){++location_.line;location_.column=1;}else ++location_.column;} return c;}
-void Lexer::skipWhitespace(){for(;;){while(std::isspace(static_cast<unsigned char>(peek())))advance(); if(peek()=='/'&&peek(1)=='/'){while(peek()&&peek()!='\n')advance();continue;}break;}}
+char Lexer::peek(std::size_t n)const{return index_+n<source_.size()?source_[index_+n]:'\0';}
+char Lexer::advance(){char c=peek();if(c){++index_;if(c=='\n'){++location_.line;location_.column=1;}else ++location_.column;}return c;}
+void Lexer::skipWhitespace(){for(;;){while(std::isspace(static_cast<unsigned char>(peek())))advance();if(peek()=='/'&&peek(1)=='/'){while(peek()&&peek()!='\n')advance();continue;}break;}}
 Token Lexer::identifier(){auto start=location_;std::size_t b=index_;while(std::isalnum(static_cast<unsigned char>(peek()))||peek()=='_')advance();std::string s(source_.substr(b,index_-b));auto it=keywords.find(s);return {it==keywords.end()?TokenKind::Identifier:it->second,s,start};}
 Token Lexer::number(){auto start=location_;std::size_t b=index_;bool dot=false;while(std::isdigit(static_cast<unsigned char>(peek()))||(!dot&&peek()=='.')){if(peek()=='.')dot=true;advance();}return {dot?TokenKind::NumberLiteral:TokenKind::IntegerLiteral,std::string(source_.substr(b,index_-b)),start};}
 Token Lexer::string(){auto start=location_;advance();std::string s;while(peek()&&peek()!='"'){if(peek()=='\\'&&peek(1)){advance();s+=advance();}else s+=advance();}if(peek()=='"')advance();return {TokenKind::StringLiteral,s,start};}
