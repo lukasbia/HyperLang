@@ -1,8 +1,7 @@
 #include "hyperlang/HIL/Optimization/HILOptimizer.h"
 #include <algorithm>
-#include <utility>
 namespace hyperlang::hil {
-void optimize(Module& module) {
+void runOptimization(Module& module) {
     for (auto& function : module.functions) {
         auto& instructions = function.instructions;
         instructions.erase(std::remove_if(instructions.begin(), instructions.end(), [](const Instruction& instruction) {
