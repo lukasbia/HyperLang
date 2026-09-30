@@ -1,8 +1,31 @@
 #pragma once
 
+#include "hyper/AST/ASTContext.h"
+#include "hyper/AST/ASTNode.h"
+#include "hyper/AST/ASTDeclaration.h"
+#include "hyper/AST/ASTExpression.h"
+#include "hyper/AST/ASTStatement.h"
+#include "hyper/AST/ASTType.h"
+#include "hyper/AST/ASTPattern.h"
+#include "hyper/AST/ASTGeneric.h"
+#include "hyper/AST/ASTAttribute.h"
+#include "hyper/AST/ASTModifier.h"
+#include "hyper/AST/ASTSourceLocation.h"
+#include "hyper/AST/ASTVisitor.h"
+#include "hyper/AST/ASTPrinter.h"
+#include "hyper/AST/ASTEnum.h"
+#include "hyper/AST/ASTStruct.h"
+#include "hyper/AST/ASTClass.h"
+#include "hyper/AST/ASTProtocol.h"
+#include "hyper/AST/ASTExtension.h"
+#include "hyper/AST/ASTImport.h"
+#include "hyper/AST/ASTClosure.h"
+#include "hyper/AST/ASTConcurrency.h"
+#include "hyper/AST/ASTOwnership.h"
+#include "hyper/AST/ASTMacro.h"
+
 #include <cstddef>
 #include <memory>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -73,7 +96,6 @@ bool isExpression(NodeKind kind) noexcept;
 bool isStatement(NodeKind kind) noexcept;
 bool isType(NodeKind kind) noexcept;
 bool isPattern(NodeKind kind) noexcept;
-
 bool contains(const SourceRange& range, std::size_t offset) noexcept;
 bool precedes(const SourcePosition& left, const SourcePosition& right) noexcept;
 
