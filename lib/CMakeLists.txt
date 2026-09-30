@@ -9,18 +9,33 @@ add_library(HyperLangCompiler
     HILOptimization/OptimizationUtils.cpp
     HILOptimization/ConstantFolding.cpp
     HILOptimization/ConstantPropagation.cpp
+    HILOptimization/SparseConditionalConstantPropagation.cpp
     HILOptimization/CopyPropagation.cpp
     HILOptimization/AlgebraicSimplification.cpp
     HILOptimization/CommonSubexpressionElimination.cpp
+    HILOptimization/LocalValueNumbering.cpp
     HILOptimization/DeadCodeElimination.cpp
+    HILOptimization/DeadStoreElimination.cpp
+    HILOptimization/StoreForwarding.cpp
+    HILOptimization/RedundantLoadElimination.cpp
     HILOptimization/BranchSimplification.cpp
+    HILOptimization/SimplifyCFG.cpp
     HILOptimization/Peephole.cpp
     HILOptimization/LoadStoreSimplification.cpp
     HILOptimization/StrengthReduction.cpp
     HILOptimization/CompareSimplification.cpp
+    HILOptimization/CompareConstantFolding.cpp
     HILOptimization/InstructionCombining.cpp
     HILOptimization/RedundantMoveElimination.cpp
+    HILOptimization/LiteralCanonicalization.cpp
     HILOptimization/FunctionCleanup.cpp
+    HILOptimization/CFGAnalysis.cpp
+    HILOptimization/LoopAnalysis.cpp
+    HILOptimization/AliasAnalysis.cpp
+    HILOptimization/RangeAnalysis.cpp
+    HILOptimization/CostModel.cpp
+    HILOptimization/OptimizationVerifier.cpp
+    HILOptimization/AnalysisDriver.cpp
     LSC/LSC.cpp
     LSC/Optimization/LSCOptimizer.cpp
     LSC/Backend/LSCMachineCode.cpp
