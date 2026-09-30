@@ -1,9 +1,7 @@
 #include "hyperlang/Driver/Driver.h"
 #include "hyperlang/CodeGen/CodeGen.h"
 #include "hyperlang/HIL/HIL.h"
-#include "hyperlang/HIL/Optimization/HILOptimizer.h"
 #include "hyperlang/LSC/LSC.h"
-#include "hyperlang/LSC/Optimization/LSCOptimizer.h"
 #include "hyperlang/Lexer/Lexer.h"
 #include "hyperlang/Parser/Parser.h"
 #include "hyperlang/Sema/Sema.h"
@@ -27,7 +25,7 @@ int Driver::run(const std::string &inputPath, const DriverOptions &options) {
 
 int Driver::compileSource(const std::string &source,
                           const DriverOptions &options) {
-    // Source -> Lexer
+    // Source code -> Lexer
     lexer::Lexer lexer(source);
     auto tokens = lexer.tokenize();
 
@@ -40,7 +38,7 @@ int Driver::compileSource(const std::string &source,
     sema::Analyzer sema;
     if (!sema.analyze(*tree)) return 1;
 
-    // Sema -> HIL
+    // Sema -> Hyper Intermediate Language (HIL)
     hil::Module hilModule = hil::lower(*tree);
 
     // HIL optimization
@@ -49,11 +47,20 @@ int Driver::compileSource(const std::string &source,
     }
 
     if (options.emitHIL) {
-        std::cout << hil::print(hilModule);
+        for (const auto &function : hilModule.functions) {
+            std::cout << "hil.function " << function.name << "\n";
+            for (const auto &instruction : function.instructions) {
+                std::cout << "  " << hil::opcodeName(instruction.opcode);
+                if (!instruction.operand.empty()) {
+                    std::cout << ' ' << instruction.operand;
+                }
+                std::cout << '\n';
+            }
+        }
         return 0;
     }
 
-    // HIL -> LSC IR
+    // HIL -> Live Synchronized Compiler IR (LSC IR)
     lsc::LiveCompiler liveCompiler;
     liveCompiler.synchronize(hilModule);
     lsc::IR lscIR = lsc::lower(hilModule);
@@ -64,36 +71,24 @@ int Driver::compileSource(const std::string &source,
     }
 
     if (options.emitLSCIR) {
-        std::cout << lsc::print(lscIR);
+        std::cout << "lsc.revision " << lscIR.revision << "\n";
+        for (const auto &instruction : lscIR.instructions) {
+            std::cout << instruction.opcode;
+            if (!instruction.operand.empty()) {
+                std::cout << ' ' << instruction.operand;
+            }
+            std::cout << '\n';
+        }
         return 0;
     }
 
-    // LSC -> machine code/backend
-    lsc::MachineCode machineCode = lsc::generateMachineCode(lscIR, options.target);
+    // LSC IR -> machine code and backend
+    lsc::MachineCode machineCode = lsc::generateMachineCode(lscIR);
 
-    if (options.emitMachineCode) {
-        std::cout << machineCode.print();
-        return 0;
-    }
-
-    // Optimizer -> cleanup -> codegen
-    codegen::CodeGenerationResult generated = codegen::generate(machineCode);
-
-    if (options.emitAssembly) {
-        std::cout << generated.assembly;
-        return 0;
-    }
-
-    if (options.emitHex) {
-        std::cout << generated.hex << "\n";
-        return 0;
-    }
-
-    // Linker boundary. The linker is intentionally kept behind CodeGen so
-    // platform-specific linkers can be attached without changing the frontend.
-    if (options.link) {
-        return codegen::link(generated, options.outputPath) ? 0 : 1;
-    }
+    // Optimizer / cleanup are represented by the LSC optimization pass and
+    // the backend's final instruction cleanup before CodeGen.
+    // CodeGen -> linker boundary
+    codegen::emit(machineCode);
 
     return 0;
 }
