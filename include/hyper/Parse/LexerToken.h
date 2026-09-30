@@ -20,6 +20,11 @@ struct NumericLiteralInfo {
     bool hasSeparators = false;
     bool hasLeadingZero = false;
     bool hasSuffix = false;
+    bool isInteger = false;
+    bool isFloating = false;
+    bool isHexadecimal = false;
+    bool isBinary = false;
+    bool isOctal = false;
 };
 
 struct StringLiteralInfo {
@@ -28,6 +33,8 @@ struct StringLiteralInfo {
     bool hasInterpolation = false;
     bool hasEscapes = false;
     bool terminated = true;
+    bool multiline = false;
+    bool raw = false;
 };
 
 struct Token {
@@ -41,12 +48,17 @@ struct Token {
     bool escapedIdentifier = false;
     bool malformed = false;
     bool hasLeadingComment = false;
+    bool hasTrailingComment = false;
+    bool isDocumentation = false;
+    bool isDirective = false;
 
     std::size_t endOffset() const noexcept;
     bool isIdentifier() const noexcept;
     bool isLiteral() const noexcept;
     bool isOperator() const noexcept;
     bool isTrivia() const noexcept;
+    bool isKeyword() const noexcept;
+    bool isPunctuation() const noexcept;
 };
 
 } // namespace hyper
