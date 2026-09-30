@@ -1,88 +1,58 @@
-#include "hyperlang/HIL/HIL.h"
-
-#include <cstdlib>
+#include "hyperlang/HIL/Optimization/HILOptimizer.h"
+#include "hyperlang/HIL/Optimization/OptimizationUtils.h"
 #include <limits>
-#include <string>
 
 namespace hyperlang::hil {
+
 namespace {
 
-bool parseInteger(const std::string& text, long long& value) {
-    if (text.empty()) return false;
-    char* end = nullptr;
-    const long long parsed = std::strtoll(text.c_str(), &end, 10);
-    if (end == text.c_str() || *end != '\0') return false;
-    value = parsed;
-    return true;
-}
-
-bool foldBinary(Instruction& instruction, const Instruction& lhs, const Instruction& rhs) {
-    long long left = 0;
-    long long right = 0;
-    if (!parseInteger(lhs.operand, left) || !parseInteger(rhs.operand, right)) return false;
-
-    long long result = 0;
-    switch (instruction.opcode) {
+bool evaluate(Opcode op, long long a, long long b, long long& out) {
+    switch (op) {
         case Opcode::Add:
-            if ((right > 0 && left > std::numeric_limits<long long>::max() - right) ||
-                (right < 0 && left < std::numeric_limits<long long>::min() - right)) return false;
-            result = left + right;
-            break;
+            if ((b > 0 && a > std::numeric_limits<long long>::max() - b) ||
+                (b < 0 && a < std::numeric_limits<long long>::min() - b)) return false;
+            out = a + b; return true;
         case Opcode::Subtract:
-            if ((right < 0 && left > std::numeric_limits<long long>::max() + right) ||
-                (right > 0 && left < std::numeric_limits<long long>::min() + right)) return false;
-            result = left - right;
-            break;
+            if ((b < 0 && a > std::numeric_limits<long long>::max() + b) ||
+                (b > 0 && a < std::numeric_limits<long long>::min() + b)) return false;
+            out = a - b; return true;
         case Opcode::Multiply:
-            if (left != 0 && right != 0) {
-                if (left == -1 && right == std::numeric_limits<long long>::min()) return false;
-                if (right == -1 && left == std::numeric_limits<long long>::min()) return false;
-                if (left > 0 && right > 0 && left > std::numeric_limits<long long>::max() / right) return false;
-                if (left < 0 && right < 0 && left < std::numeric_limits<long long>::max() / right) return false;
-                if (left > 0 && right < 0 && right < std::numeric_limits<long long>::min() / left) return false;
-                if (left < 0 && right > 0 && left < std::numeric_limits<long long>::min() / right) return false;
+            if (a != 0 && b != 0) {
+                if (a == -1 && b == std::numeric_limits<long long>::min()) return false;
+                if (b == -1 && a == std::numeric_limits<long long>::min()) return false;
+                if (a > 0 && b > 0 && a > std::numeric_limits<long long>::max() / b) return false;
+                if (a < 0 && b < 0 && a < std::numeric_limits<long long>::max() / b) return false;
+                if (a > 0 && b < 0 && b < std::numeric_limits<long long>::min() / a) return false;
+                if (a < 0 && b > 0 && a < std::numeric_limits<long long>::min() / b) return false;
             }
-            result = left * right;
-            break;
+            out = a * b; return true;
         case Opcode::Divide:
-            if (right == 0 || (left == std::numeric_limits<long long>::min() && right == -1)) return false;
-            result = left / right;
-            break;
+            if (b == 0 || (a == std::numeric_limits<long long>::min() && b == -1)) return false;
+            out = a / b; return true;
         default:
             return false;
     }
-
-    instruction.opcode = Opcode::LoadLiteral;
-    instruction.operand = std::to_string(result);
-    return true;
 }
 
-} // namespace
+}
 
-void optimize(Module& module) {
-    for (Function& function : module.functions) {
-        std::vector<Instruction> folded;
-        folded.reserve(function.instructions.size());
+bool runConstantFolding(Module& module) {
+    bool changed = false;
+    for (auto& function : module.functions) {
+        for (auto& instruction : function.instructions) {
+            auto ops = optimization::operandsOf(instruction);
+            if (!optimization::isBinaryArithmetic(instruction.opcode) || ops.size() != 2) continue;
 
-        for (std::size_t index = 0; index < function.instructions.size(); ++index) {
-            Instruction current = function.instructions[index];
-            if (current.opcode == Opcode::Add || current.opcode == Opcode::Subtract ||
-                current.opcode == Opcode::Multiply || current.opcode == Opcode::Divide) {
-                if (index >= 2 && folded.size() >= 2) {
-                    const Instruction& lhs = folded[folded.size() - 2];
-                    const Instruction& rhs = folded[folded.size() - 1];
-                    if (lhs.opcode == Opcode::LoadLiteral && rhs.opcode == Opcode::LoadLiteral &&
-                        foldBinary(current, lhs, rhs)) {
-                        folded.pop_back();
-                        folded.pop_back();
-                    }
-                }
-            }
-            folded.push_back(std::move(current));
+            long long lhs = 0, rhs = 0, result = 0;
+            if (!optimization::parseInteger(ops[0], lhs) || !optimization::parseInteger(ops[1], rhs)) continue;
+            if (!evaluate(instruction.opcode, lhs, rhs, result)) continue;
+
+            instruction.opcode = Opcode::LoadLiteral;
+            optimization::setOperands(instruction, {std::to_string(result)});
+            changed = true;
         }
-
-        function.instructions = std::move(folded);
     }
+    return changed;
 }
 
 } // namespace hyperlang::hil
