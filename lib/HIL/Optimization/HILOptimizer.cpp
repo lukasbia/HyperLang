@@ -3,6 +3,34 @@
 
 namespace hyperlang::hil {
 
+namespace optimization {
+bool runConstantPropagation(Module&);
+bool runCopyPropagation(Module&);
+bool runAlgebraicSimplification(Module&);
+bool runCommonSubexpressionElimination(Module&);
+bool runDeadCodeElimination(Module&);
+bool runBranchSimplification(Module&);
+bool runPeephole(Module&);
+bool runLoadStoreSimplification(Module&);
+bool runStrengthReduction(Module&);
+bool runCompareSimplification(Module&);
+bool runInstructionCombining(Module&);
+bool runRedundantMoveElimination(Module&);
+}
+
+bool runConstantPropagation(Module& m) { return optimization::runConstantPropagation(m); }
+bool runCopyPropagation(Module& m) { return optimization::runCopyPropagation(m); }
+bool runAlgebraicSimplification(Module& m) { return optimization::runAlgebraicSimplification(m); }
+bool runCommonSubexpressionElimination(Module& m) { return optimization::runCommonSubexpressionElimination(m); }
+bool runDeadCodeElimination(Module& m) { return optimization::runDeadCodeElimination(m); }
+bool runBranchSimplification(Module& m) { return optimization::runBranchSimplification(m); }
+bool runPeephole(Module& m) { return optimization::runPeephole(m); }
+bool runLoadStoreSimplification(Module& m) { return optimization::runLoadStoreSimplification(m); }
+bool runStrengthReduction(Module& m) { return optimization::runStrengthReduction(m); }
+bool runCompareSimplification(Module& m) { return optimization::runCompareSimplification(m); }
+bool runInstructionCombining(Module& m) { return optimization::runInstructionCombining(m); }
+bool runRedundantMoveElimination(Module& m) { return optimization::runRedundantMoveElimination(m); }
+
 namespace {
 
 struct Pass {
@@ -47,7 +75,7 @@ OptimizationStats optimizeModule(Module& module, const OptimizationOptions& opti
         ++stats.iterations;
 
         for (const auto& pass : pipeline) {
-            if (!(options.*pass.enabled)) continue;
+            if (!(options.*(pass.enabled))) continue;
             if (!pass.run(module)) continue;
             changedThisRound = true;
             ++stats.transformations;
