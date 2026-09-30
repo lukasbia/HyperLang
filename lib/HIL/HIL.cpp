@@ -1,6 +1,7 @@
 #include "hyperlang/HIL/HIL.h"
 #include "hyperlang/HIL/Optimization/HILOptimizer.h"
 #include "hyperlang/AST/AST.h"
+#include <utility>
 namespace hyperlang::hil {
 const char* opcodeName(Opcode op) {
     switch (op) {
@@ -32,5 +33,5 @@ Module lower(const ast::Program& program) {
     }
     return module;
 }
-void optimize(Module& module) { hil::optimize(module); }
+void optimize(Module& module) { runOptimization(module); }
 }
