@@ -1,8 +1,5 @@
 #include "hyperlang/HIL/Optimization/HILOptimizer.h"
-
 #include <array>
-#include <functional>
-#include <utility>
 
 namespace hyperlang::hil {
 
@@ -17,20 +14,28 @@ struct Pass {
 }
 
 OptimizationStats optimizeModule(Module& module, const OptimizationOptions& options) {
-    static constexpr std::array<Pass, 14> pipeline{{
+    static constexpr std::array<Pass, 22> pipeline{{
         {"ConstantFolding", &OptimizationOptions::constantFolding, &runConstantFolding},
         {"ConstantPropagation", &OptimizationOptions::constantPropagation, &runConstantPropagation},
+        {"SparseConditionalConstantPropagation", &OptimizationOptions::sparseConditionalConstantPropagation, &runSparseConditionalConstantPropagation},
         {"CopyPropagation", &OptimizationOptions::copyPropagation, &runCopyPropagation},
         {"AlgebraicSimplification", &OptimizationOptions::algebraicSimplification, &runAlgebraicSimplification},
         {"CommonSubexpressionElimination", &OptimizationOptions::commonSubexpressionElimination, &runCommonSubexpressionElimination},
+        {"LocalValueNumbering", &OptimizationOptions::localValueNumbering, &runLocalValueNumbering},
         {"DeadCodeElimination", &OptimizationOptions::deadCodeElimination, &runDeadCodeElimination},
+        {"DeadStoreElimination", &OptimizationOptions::deadStoreElimination, &runDeadStoreElimination},
+        {"StoreForwarding", &OptimizationOptions::storeForwarding, &runStoreForwarding},
+        {"RedundantLoadElimination", &OptimizationOptions::redundantLoadElimination, &runRedundantLoadElimination},
         {"BranchSimplification", &OptimizationOptions::branchSimplification, &runBranchSimplification},
+        {"SimplifyCFG", &OptimizationOptions::simplifyCFG, &runSimplifyCFG},
         {"Peephole", &OptimizationOptions::peephole, &runPeephole},
         {"LoadStoreSimplification", &OptimizationOptions::loadStoreSimplification, &runLoadStoreSimplification},
         {"StrengthReduction", &OptimizationOptions::strengthReduction, &runStrengthReduction},
         {"CompareSimplification", &OptimizationOptions::compareSimplification, &runCompareSimplification},
+        {"CompareConstantFolding", &OptimizationOptions::compareConstantFolding, &runCompareConstantFolding},
         {"InstructionCombining", &OptimizationOptions::instructionCombining, &runInstructionCombining},
         {"RedundantMoveElimination", &OptimizationOptions::redundantMoveElimination, &runRedundantMoveElimination},
+        {"LiteralCanonicalization", &OptimizationOptions::literalCanonicalization, &runLiteralCanonicalization},
         {"FunctionCleanup", &OptimizationOptions::functionCleanup, &runFunctionCleanup},
     }};
 
@@ -42,7 +47,7 @@ OptimizationStats optimizeModule(Module& module, const OptimizationOptions& opti
         ++stats.iterations;
 
         for (const auto& pass : pipeline) {
-            if (!(options.*(pass.enabled))) continue;
+            if (!(options.*pass.enabled)) continue;
             if (!pass.run(module)) continue;
             changedThisRound = true;
             ++stats.transformations;
