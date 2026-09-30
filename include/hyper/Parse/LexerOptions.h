@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace hyper {
 
 struct LexerOptions {
@@ -7,11 +9,17 @@ struct LexerOptions {
     bool allowHashbang = true;
     bool allowRegexLiterals = false;
     bool treatEditorPlaceholdersAsTokens = true;
-    bool preserveTrivia = false;
-    bool diagnoseUTF8Errors = true;
-    bool diagnoseNumericSeparators = true;
-    bool diagnoseStringEscapes = true;
-    bool diagnoseOperatorSpacing = true;
+    bool allowUnicodeIdentifiers = true;
+    bool allowEscapedIdentifiers = true;
+    bool allowDollarIdentifiers = true;
+    bool allowMultilineStrings = true;
+    bool allowRawStrings = true;
+    bool allowNumericSeparators = true;
+    bool allowHexFloatingPoint = true;
+    bool recoverMalformedTokens = true;
+    bool preserveWhitespace = false;
+    bool preserveNewlines = false;
+    std::size_t maximumLookahead = 256;
 };
 
 } // namespace hyper
