@@ -3160,13 +3160,13 @@ bool Lexer::isEscapedIdentifierEntirelyWhitespace(
 
 bool Lexer::isASCIIIdentifierStart(
     char value) noexcept {
-    return isASCIIIdentifierStart(
+    return isASCIIIdentifierStartImpl(
         value);
 }
 
 bool Lexer::isASCIIIdentifierContinue(
     char value) noexcept {
-    return isASCIIIdentifierContinue(
+    return isASCIIIdentifierContinueImpl(
         value);
 }
 
@@ -3231,19 +3231,19 @@ bool Lexer::isForbiddenIdentifierCodePoint(
 
 bool Lexer::isOperatorCharacter(
     char value) noexcept {
-    return isOperatorCharacter(
+    return isOperatorCharacterImpl(
         value);
 }
 
 bool Lexer::isOperatorStartCharacter(
     char value) noexcept {
-    return isOperatorCharacter(
+    return isOperatorCharacterImpl(
         value);
 }
 
 bool Lexer::isOperatorContinuationCharacter(
     char value) noexcept {
-    return isOperatorCharacter(
+    return isOperatorCharacterImpl(
         value);
 }
 
