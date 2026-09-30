@@ -1,3 +1,51 @@
 #pragma once
+
 #include "hyperlang/HIL/HIL.h"
-namespace hyperlang::hil { void runOptimization(Module& module); }
+#include <cstddef>
+#include <string>
+#include <vector>
+
+namespace hyperlang::hil {
+
+struct OptimizationOptions {
+    bool constantFolding = true;
+    bool constantPropagation = true;
+    bool copyPropagation = true;
+    bool algebraicSimplification = true;
+    bool commonSubexpressionElimination = true;
+    bool deadCodeElimination = true;
+    bool branchSimplification = true;
+    bool peephole = true;
+    bool loadStoreSimplification = true;
+    bool strengthReduction = true;
+    bool compareSimplification = true;
+    bool instructionCombining = true;
+    bool redundantMoveElimination = true;
+    bool functionCleanup = true;
+};
+
+struct OptimizationStats {
+    std::size_t iterations = 0;
+    std::size_t transformations = 0;
+    std::vector<std::string> changedPasses;
+};
+
+bool runConstantFolding(Module& module);
+bool runConstantPropagation(Module& module);
+bool runCopyPropagation(Module& module);
+bool runAlgebraicSimplification(Module& module);
+bool runCommonSubexpressionElimination(Module& module);
+bool runDeadCodeElimination(Module& module);
+bool runBranchSimplification(Module& module);
+bool runPeephole(Module& module);
+bool runLoadStoreSimplification(Module& module);
+bool runStrengthReduction(Module& module);
+bool runCompareSimplification(Module& module);
+bool runInstructionCombining(Module& module);
+bool runRedundantMoveElimination(Module& module);
+bool runFunctionCleanup(Module& module);
+
+OptimizationStats optimizeModule(Module& module, const OptimizationOptions& options = {});
+void runOptimization(Module& module);
+
+} // namespace hyperlang::hil
