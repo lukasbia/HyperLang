@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <string_view>
 
 namespace hyper {
 
@@ -11,34 +10,43 @@ enum class TokenKind : std::uint16_t;
 enum class OperatorBinding : std::uint8_t;
 enum class NumberBase : std::uint8_t;
 enum class StringKind : std::uint8_t;
+struct SourceLocation;
 
-struct SourceLocation {
-    std::size_t offset = 0;
-    std::size_t line = 1;
-    std::size_t column = 1;
+struct NumericLiteralInfo {
+    NumberBase base{};
+    bool hasDecimalPoint = false;
+    bool hasExponent = false;
+    bool exponentIsBinary = false;
+    bool hasSeparators = false;
+    bool hasLeadingZero = false;
+    bool hasSuffix = false;
+};
+
+struct StringLiteralInfo {
+    StringKind kind{};
+    unsigned customDelimiterLength = 0;
+    bool hasInterpolation = false;
+    bool hasEscapes = false;
+    bool terminated = true;
 };
 
 struct Token {
-    TokenKind kind;
+    TokenKind kind{};
     std::string text;
-    SourceLocation location;
-    OperatorBinding binding;
-    NumberBase numberBase;
-    StringKind stringKind;
+    SourceLocation location{};
+    OperatorBinding binding{};
+    NumericLiteralInfo numeric{};
+    StringLiteralInfo string{};
     bool atStartOfLine = false;
     bool escapedIdentifier = false;
     bool malformed = false;
     bool hasLeadingComment = false;
 
-    std::size_t endOffset() const noexcept {
-        return location.offset + text.size();
-    }
+    std::size_t endOffset() const noexcept;
+    bool isIdentifier() const noexcept;
+    bool isLiteral() const noexcept;
+    bool isOperator() const noexcept;
+    bool isTrivia() const noexcept;
 };
-
-std::string_view tokenText(const Token&) noexcept;
-bool tokenIsTrivia(TokenKind) noexcept;
-bool tokenIsLiteral(TokenKind) noexcept;
-bool tokenIsKeyword(TokenKind) noexcept;
-bool tokenIsOperator(TokenKind) noexcept;
 
 } // namespace hyper
