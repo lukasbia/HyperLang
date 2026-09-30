@@ -1,2 +1,18 @@
 #include "hyper/HIL/HIL.h"
-namespace hyper::hil { }
+
+namespace hyper::hil {
+
+bool analyzeProtocols(const Module& module) noexcept {
+    for (const auto& function : module.functions()) {
+        for (const auto& block : function.blocks()) {
+            for (const auto& instruction : block.instructions()) {
+                if (!instruction.hasResult()) continue;
+                const auto& type = instruction.result().type;
+                if (type.find("protocol") != std::string::npos && instruction.result().name.empty()) return false;
+            }
+        }
+    }
+    return true;
+}
+
+} // namespace hyper::hil
