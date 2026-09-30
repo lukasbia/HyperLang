@@ -1,7 +1,7 @@
 #include "hyperlang/HIL/Optimization/OptimizationUtils.h"
-
 #include <charconv>
 #include <cctype>
+#include <utility>
 
 namespace hyperlang::hil::optimization {
 
@@ -18,13 +18,15 @@ std::vector<std::string> splitOperands(std::string_view text) {
     std::string current;
     for (char ch : text) {
         if (ch == ',') {
-            if (!trim(current).empty()) result.push_back(trim(current));
+            const auto cleaned = trim(current);
+            if (!cleaned.empty()) result.push_back(cleaned);
             current.clear();
         } else {
             current.push_back(ch);
         }
     }
-    if (!trim(current).empty()) result.push_back(trim(current));
+    const auto cleaned = trim(current);
+    if (!cleaned.empty()) result.push_back(cleaned);
     return result;
 }
 
