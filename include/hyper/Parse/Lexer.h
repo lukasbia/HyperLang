@@ -64,17 +64,20 @@ private:
     bool allowHashbang_ = true;
     bool allowRegexLiterals_ = false;
     bool treatEditorPlaceholdersAsTokens_ = true;
+    bool atStartOfLine_ = true;
+    bool hadLeadingComment_ = false;
+    std::string leadingComment_;
 
     std::vector<LexerDiagnostic> diagnostics_;
     std::vector<Token> lookaheadBuffer_;
 
     char peekCharacter(std::size_t distance = 0) const noexcept;
-    char advance();
-    bool match(char expected);
+    char advance() noexcept;
+    bool match(char expected) noexcept;
     bool startsWith(std::string_view text) const noexcept;
     SourceLocation locationFromOffset(std::size_t offset) const;
     Token makeToken(TokenKind kind, std::size_t start,
-                    SourceLocation location, bool malformed = false);
+                    SourceLocation location, bool malformed = false) const;
 
     void diagnose(LexerDiagnostic::Severity severity, SourceLocation location,
                   std::string message, std::string replacement = {});
