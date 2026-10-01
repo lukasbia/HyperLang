@@ -155,7 +155,7 @@ void Compiler::lowerSyntaxToHIL(const SyntaxNode& node, hil::Module& module) {
 
 void Compiler::appendLineIR(std::string_view source, llcvm::Module& module) {
     llcvm::IRGenerator generator;
-    std::istringstream lines(std::string(source));
+    std::istringstream lines{std::string(source)};
     std::string current;
     std::size_t line = 1;
 
