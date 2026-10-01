@@ -40,6 +40,9 @@ public:
     SourcePosition position() const noexcept;
     SourceManager::FileID fileID() const noexcept;
 
+    LexerState saveState() const noexcept;
+    void restoreState(const LexerState& state) noexcept;
+
 private:
     SourceManager* sources_ = nullptr;
     SourceManager::FileID file_ = 0;
