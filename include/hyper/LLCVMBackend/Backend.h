@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <string_view>
 
 namespace hyper::llcvm::backend {
 
@@ -29,5 +30,9 @@ public:
 private:
     TargetArchitecture target_;
 };
+
+TargetArchitecture parseTarget(std::string_view spelling) noexcept;
+const char* targetName(TargetArchitecture target) noexcept;
+std::string emitHex(const MachineCode& code);
 
 } // namespace hyper::llcvm::backend
