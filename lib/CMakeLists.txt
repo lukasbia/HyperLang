@@ -1,0 +1,7 @@
+add_subdirectory(Parse)
+add_subdirectory(Sema)
+add_subdirectory(HIL)
+add_subdirectory(HILOptimization)
+add_subdirectory(LLCVM)
+add_subdirectory(LLCVMBackend)
+add_subdirectory(LLCVMOptimization)
