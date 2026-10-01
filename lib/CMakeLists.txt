@@ -1,4 +1,7 @@
 add_subdirectory(Parse)
 add_subdirectory(Sema)
-# HIL, HILOptimization, LLCVM, and LLCVMBackend are added once their interfaces
-# are synchronized with the Swift-derived front end.
+add_subdirectory(HIL)
+add_subdirectory(HILOptimization)
+add_subdirectory(LLCVM)
+add_subdirectory(LLCVMOptimization)
+add_subdirectory(LLCVMBackend)
