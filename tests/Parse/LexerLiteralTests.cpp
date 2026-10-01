@@ -1,4 +1,4 @@
-#include "hyper/lib/Parse/Lexer.h"
+#include "hyper/lib/Parse/Lexer.cpp"
 #include <iostream>
 using namespace hyper::parse;
 static int failures=0; static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
