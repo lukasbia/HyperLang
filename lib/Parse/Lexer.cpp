@@ -1,4 +1,68 @@
-#include "hyper/lib/Parse/Lexer.h"
+#ifndef HYPER_LEXER_SINGLE_FILE_INCLUDED
+#define HYPER_LEXER_SINGLE_FILE_INCLUDED
+
+#include "hyper/lib/Parse/Token.h"
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <string_view>
+#include <vector>
+namespace hyper::parse {
+enum class DiagnosticSeverity : std::uint8_t { Note, Warning, Error, Fatal };
+struct LexerDiagnostic {
+ DiagnosticSeverity severity=DiagnosticSeverity::Error; SourceRange range{}; std::string message{};
+};
+struct LexerOptions {
+ bool preserveComments=false;
+ bool allowUnicodeIdentifiers=true;
+ bool allowNumericSeparators=true;
+ bool allowBinaryLiterals=true;
+ bool allowOctalLiterals=true;
+ bool allowHexLiterals=true;
+ bool allowScientificNotation=true;
+ bool diagnoseUnknownUnicode=false;
+};
+class Lexer {
+public:
+ using DiagnosticHandler=std::function<void(const LexerDiagnostic&)>;
+ Lexer(SourceManager& sources,SourceManager::FileID file,LexerOptions options={});
+ Lexer(std::string_view source,LexerOptions options={});
+ void reset(SourceManager::FileID file);
+ void reset(std::string_view source);
+ Token lex();
+ std::vector<Token> lexAll();
+ const Token& currentToken()const noexcept;
+ const std::vector<LexerDiagnostic>& diagnostics()const noexcept;
+ void setDiagnosticHandler(DiagnosticHandler handler);
+ bool hasErrors()const noexcept;
+ bool hadFatalError()const noexcept;
+ SourceOffset offset()const noexcept;
+ SourcePosition position()const noexcept;
+ SourceManager::FileID fileID()const noexcept;
+private:
+ SourceManager* sources_=nullptr; SourceManager::FileID file_=0; SourceText ownedSource_{};
+ std::string_view input_{}; LexerOptions options_{}; DiagnosticHandler diagnosticHandler_{};
+ std::vector<LexerDiagnostic> diagnostics_{}; Token current_{};
+ SourceOffset cursor_=0; SourceOffset tokenStart_=0; SourceLine line_=1; SourceColumn column_=1;
+ bool fatal_=false; bool reachedEOF_=false;
+ char peek(std::size_t lookahead=0)const noexcept; bool atEnd()const noexcept;
+ char consume(); bool consumeIf(char); bool consumeIf(std::string_view);
+ void skipWhitespace(); bool skipLineComment(); bool skipBlockComment();
+ Token lexIdentifierOrKeyword(); Token lexNumber(); Token lexString(); Token lexCharacter();
+ Token lexOperatorOrPunctuation(); Token makeToken(TokenKind,SourceOffset)const;
+ Token makeSimple(TokenKind);
+ void error(std::string); void errorAt(SourceRange,std::string);
+ bool isIdentifierStart(unsigned char)const noexcept; bool isIdentifierContinue(unsigned char)const noexcept;
+ bool lexUTF8Identifier(); std::uint32_t decodeUTF8(SourceOffset,std::size_t&)const noexcept;
+ bool lexEscape(std::string&); bool lexHexEscape(std::string&,std::size_t);
+ bool lexUnicodeEscape(std::string&,std::size_t);
+ bool isDecimalDigit(char)const noexcept; bool isHexDigit(char)const noexcept; bool isBinaryDigit(char)const noexcept; bool isOctalDigit(char)const noexcept;
+ void consumeDigits(int base); bool consumeNumericSeparator();
+ TokenKind lookupKeyword(std::string_view)const noexcept; TokenKind lookupSpecialKeyword(std::string_view)const noexcept;
+};
+}
+
+#include "hyper/lib/Parse/Token.h"
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -106,16 +170,16 @@ constexpr std::array<KeywordEntry,9> specialTable={{
 {"@imageID", TokenKind::AtImageId}
 }};
 }
-Lexer::Lexer(SourceManager&s,SourceManager::FileID f,LexerOptions o):sources_(&s),file_(f),options_(o){reset(f);}
-Lexer::Lexer(std::string_view s,LexerOptions o):options_(o){reset(s);}
-void Lexer::reset(SourceManager::FileID f){file_=f;input_=sources_?sources_->source(f).view():std::string_view{};cursor_=0;tokenStart_=0;line_=1;column_=1;fatal_=false;reachedEOF_=false;diagnostics_.clear();current_={};}
-void Lexer::reset(std::string_view s){sources_=nullptr;file_=0;ownedSource_.reset(s);input_=ownedSource_.view();cursor_=0;tokenStart_=0;line_=1;column_=1;fatal_=false;reachedEOF_=false;diagnostics_.clear();current_={};}
-char Lexer::peek(std::size_t n)const noexcept{return cursor_+n<input_.size()?input_[cursor_+n]:'\0';}
-bool Lexer::atEnd()const noexcept{return cursor_>=input_.size();}
-char Lexer::consume(){if(atEnd())return '\0';char c=input_[cursor_++];if(c=='\n'){++line_;column_=1;}else{++column_;}return c;}
-bool Lexer::consumeIf(char c){if(peek()==c){consume();return true;}return false;}
-bool Lexer::consumeIf(std::string_view s){if(input_.substr(cursor_,s.size())==s){for(char c:s)(void)c,consume();return true;}return false;}
-void Lexer::skipWhitespace(){
+inline Lexer::Lexer(SourceManager&s,SourceManager::FileID f,LexerOptions o):sources_(&s),file_(f),options_(o){reset(f);}
+inline Lexer::Lexer(std::string_view s,LexerOptions o):options_(o){reset(s);}
+void inline Lexer::reset(SourceManager::FileID f){file_=f;input_=sources_?sources_->source(f).view():std::string_view{};cursor_=0;tokenStart_=0;line_=1;column_=1;fatal_=false;reachedEOF_=false;diagnostics_.clear();current_={};}
+void inline Lexer::reset(std::string_view s){sources_=nullptr;file_=0;ownedSource_.reset(s);input_=ownedSource_.view();cursor_=0;tokenStart_=0;line_=1;column_=1;fatal_=false;reachedEOF_=false;diagnostics_.clear();current_={};}
+char inline Lexer::peek(std::size_t n)const noexcept{return cursor_+n<input_.size()?input_[cursor_+n]:'\0';}
+bool inline Lexer::atEnd()const noexcept{return cursor_>=input_.size();}
+char inline Lexer::consume(){if(atEnd())return '\0';char c=input_[cursor_++];if(c=='\n'){++line_;column_=1;}else{++column_;}return c;}
+bool inline Lexer::consumeIf(char c){if(peek()==c){consume();return true;}return false;}
+bool inline Lexer::consumeIf(std::string_view s){if(input_.substr(cursor_,s.size())==s){for(char c:s)(void)c,consume();return true;}return false;}
+void inline Lexer::skipWhitespace(){
  while(!atEnd()){
   unsigned char c=static_cast<unsigned char>(peek());
   if(c==' '||c=='\t'||c=='\r'||c=='\n'||c=='\f'||c=='\v'){consume();continue;}
@@ -123,20 +187,20 @@ void Lexer::skipWhitespace(){
   break;
  }
 }
-bool Lexer::skipLineComment(){if(!consumeIf("//"))return false;while(!atEnd()&&peek()!='\n')consume();return true;}
-bool Lexer::skipBlockComment(){
+bool inline Lexer::skipLineComment(){if(!consumeIf("//"))return false;while(!atEnd()&&peek()!='\n')consume();return true;}
+bool inline Lexer::skipBlockComment(){
  if(!consumeIf("/*"))return false;SourceOffset start=tokenStart_;
  while(!atEnd()){if(consumeIf("*/"))return true;consume();}
  errorAt(makeToken(TokenKind::Unknown,start).range,"unterminated block comment");fatal_=true;return true;
 }
-Token Lexer::makeToken(TokenKind k,SourceOffset start)const{
+Token inline Lexer::makeToken(TokenKind k,SourceOffset start)const{
  SourcePosition b{start,0,0},e{cursor_,0,0};
  if(sources_&&file_) {b=sources_->position(file_,start);e=sources_->position(file_,cursor_);}
  else {b={start,1,static_cast<SourceColumn>(start+1)};e={cursor_,line_,column_};}
  return {k,{b,e},std::string(input_.substr(start,cursor_-start))};
 }
-Token Lexer::makeSimple(TokenKind k){return makeToken(k,tokenStart_);}
-Token Lexer::lex(){
+Token inline Lexer::makeSimple(TokenKind k){return makeToken(k,tokenStart_);}
+Token inline Lexer::lex(){
  if(reachedEOF_)return current_;
  for(;;){
   tokenStart_=cursor_;
@@ -155,25 +219,25 @@ Token Lexer::lex(){
  else current_=lexOperatorOrPunctuation();
  return current_;
 }
-std::vector<Token> Lexer::lexAll(){std::vector<Token> out;while(true){Token t=lex();out.push_back(t);if(t.isEOF())break;}return out;}
-const Token& Lexer::currentToken()const noexcept{return current_;}
-const std::vector<LexerDiagnostic>& Lexer::diagnostics()const noexcept{return diagnostics_;}
-void Lexer::setDiagnosticHandler(DiagnosticHandler h){diagnosticHandler_=std::move(h);}
-bool Lexer::hasErrors()const noexcept{return std::any_of(diagnostics_.begin(),diagnostics_.end(),[](const auto&d){return d.severity==DiagnosticSeverity::Error||d.severity==DiagnosticSeverity::Fatal;});}
-bool Lexer::hadFatalError()const noexcept{return fatal_;}
-SourceOffset Lexer::offset()const noexcept{return cursor_;}
-SourcePosition Lexer::position()const noexcept{return sources_&&file_?sources_->position(file_,cursor_):SourcePosition{cursor_,line_,column_};}
-SourceManager::FileID Lexer::fileID()const noexcept{return file_;}
-bool Lexer::isIdentifierStart(unsigned char c)const noexcept{return std::isalpha(c)||c=='_'||c>=0x80;}
-bool Lexer::isIdentifierContinue(unsigned char c)const noexcept{return std::isalnum(c)||c=='_'||c>=0x80;}
-bool Lexer::isDecimalDigit(char c)const noexcept{return c>='0'&&c<='9';}
-bool Lexer::isHexDigit(char c)const noexcept{return std::isxdigit(static_cast<unsigned char>(c));}
-bool Lexer::isBinaryDigit(char c)const noexcept{return c=='0'||c=='1';}
-bool Lexer::isOctalDigit(char c)const noexcept{return c>='0'&&c<='7';}
-void Lexer::consumeDigits(int base){for(;;){char c=peek();bool ok=base==10?isDecimalDigit(c):base==16?isHexDigit(c):base==8?isOctalDigit(c):isBinaryDigit(c);if(ok){consume();continue;}if(c=='_'&&options_.allowNumericSeparators){consume();continue;}break;}}
-bool Lexer::consumeNumericSeparator(){return options_.allowNumericSeparators&&consumeIf('_');}
-TokenKind Lexer::lookupKeyword(std::string_view s)const noexcept{for(auto&e:keywordTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
-TokenKind Lexer::lookupSpecialKeyword(std::string_view s)const noexcept{for(auto&e:specialTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
+std::vector<Token> inline Lexer::lexAll(){std::vector<Token> out;while(true){Token t=lex();out.push_back(t);if(t.isEOF())break;}return out;}
+const Token& inline Lexer::currentToken()const noexcept{return current_;}
+const std::vector<LexerDiagnostic>& inline Lexer::diagnostics()const noexcept{return diagnostics_;}
+void inline Lexer::setDiagnosticHandler(DiagnosticHandler h){diagnosticHandler_=std::move(h);}
+bool inline Lexer::hasErrors()const noexcept{return std::any_of(diagnostics_.begin(),diagnostics_.end(),[](const auto&d){return d.severity==DiagnosticSeverity::Error||d.severity==DiagnosticSeverity::Fatal;});}
+bool inline Lexer::hadFatalError()const noexcept{return fatal_;}
+SourceOffset inline Lexer::offset()const noexcept{return cursor_;}
+SourcePosition inline Lexer::position()const noexcept{return sources_&&file_?sources_->position(file_,cursor_):SourcePosition{cursor_,line_,column_};}
+SourceManager::FileID inline Lexer::fileID()const noexcept{return file_;}
+bool inline Lexer::isIdentifierStart(unsigned char c)const noexcept{return std::isalpha(c)||c=='_'||c>=0x80;}
+bool inline Lexer::isIdentifierContinue(unsigned char c)const noexcept{return std::isalnum(c)||c=='_'||c>=0x80;}
+bool inline Lexer::isDecimalDigit(char c)const noexcept{return c>='0'&&c<='9';}
+bool inline Lexer::isHexDigit(char c)const noexcept{return std::isxdigit(static_cast<unsigned char>(c));}
+bool inline Lexer::isBinaryDigit(char c)const noexcept{return c=='0'||c=='1';}
+bool inline Lexer::isOctalDigit(char c)const noexcept{return c>='0'&&c<='7';}
+void inline Lexer::consumeDigits(int base){for(;;){char c=peek();bool ok=base==10?isDecimalDigit(c):base==16?isHexDigit(c):base==8?isOctalDigit(c):isBinaryDigit(c);if(ok){consume();continue;}if(c=='_'&&options_.allowNumericSeparators){consume();continue;}break;}}
+bool inline Lexer::consumeNumericSeparator(){return options_.allowNumericSeparators&&consumeIf('_');}
+TokenKind inline Lexer::lookupKeyword(std::string_view s)const noexcept{for(auto&e:keywordTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
+TokenKind inline Lexer::lookupSpecialKeyword(std::string_view s)const noexcept{for(auto&e:specialTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
 }
 
 
@@ -184,7 +248,7 @@ namespace {
 bool isNameByte(unsigned char c){return std::isalnum(c)||c=='_'||c>=0x80;}
 int hexValue(char c){if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;return -1;}
 }
-Token Lexer::lexIdentifierOrKeyword(){
+Token inline Lexer::lexIdentifierOrKeyword(){
  const auto start=tokenStart_;
  while(!atEnd()){
   unsigned char c=static_cast<unsigned char>(peek());
@@ -198,7 +262,7 @@ Token Lexer::lexIdentifierOrKeyword(){
   kind=lookupSpecialKeyword(spelling);
  return makeToken(kind,start);
 }
-Token Lexer::lexNumber(){
+Token inline Lexer::lexNumber(){
  const auto start=tokenStart_;
  bool floating=false;
  if(peek()=='.'){floating=true;consume();consumeDigits(10);}
@@ -217,12 +281,12 @@ Token Lexer::lexNumber(){
  if(std::isalpha(static_cast<unsigned char>(peek()))||peek()=='_')error("invalid character in numeric literal");
  return makeToken(floating?TokenKind::FloatingLiteral:TokenKind::IntegerLiteral,start);
 }
-bool Lexer::lexHexEscape(std::string&out,std::size_t count){
+bool inline Lexer::lexHexEscape(std::string&out,std::size_t count){
  std::uint32_t value=0;
  for(std::size_t i=0;i<count;++i){int v=hexValue(peek());if(v<0){error("invalid hexadecimal escape");return false;}value=(value<<4)|static_cast<std::uint32_t>(v);consume();}
  out.push_back(static_cast<char>(value&0xff));return true;
 }
-bool Lexer::lexUnicodeEscape(std::string&out,std::size_t count){
+bool inline Lexer::lexUnicodeEscape(std::string&out,std::size_t count){
  if(!consumeIf('{')){error("expected '{' in unicode escape");return false;}
  std::uint32_t value=0;std::size_t digits=0;
  while(!atEnd()&&peek()!='}'){int v=hexValue(peek());if(v<0||digits>=count){error("invalid unicode escape");return false;}value=(value<<4)|static_cast<std::uint32_t>(v);++digits;consume();}
@@ -233,7 +297,7 @@ bool Lexer::lexUnicodeEscape(std::string&out,std::size_t count){
  else{out.push_back(static_cast<char>(0xf0|(value>>18)));out.push_back(static_cast<char>(0x80|((value>>12)&0x3f)));out.push_back(static_cast<char>(0x80|((value>>6)&0x3f)));out.push_back(static_cast<char>(0x80|(value&0x3f)));}
  return true;
 }
-bool Lexer::lexEscape(std::string&out){
+bool inline Lexer::lexEscape(std::string&out){
  if(atEnd())return false;char c=consume();
  switch(c){
   case 'n':out+='\n';return true; case 'r':out+='\r';return true; case 't':out+='\t';return true;
@@ -244,7 +308,7 @@ bool Lexer::lexEscape(std::string&out){
   default:error("unknown escape sequence");out.push_back(c);return false;
  }
 }
-Token Lexer::lexString(){
+Token inline Lexer::lexString(){
  const auto start=tokenStart_;consume();std::string value;
  while(!atEnd()){
   if(peek()=='"'){consume();return makeToken(TokenKind::StringLiteral,start);}
@@ -254,7 +318,7 @@ Token Lexer::lexString(){
  }
  error("unterminated string literal");return makeToken(TokenKind::Unknown,start);
 }
-Token Lexer::lexCharacter(){
+Token inline Lexer::lexCharacter(){
  const auto start=tokenStart_;consume();std::string value;
  if(atEnd()||peek()=='\n'){error("unterminated character literal");return makeToken(TokenKind::Unknown,start);}
  if(peek()=='\\'){consume();lexEscape(value);}else value.push_back(consume());
@@ -267,7 +331,7 @@ Token Lexer::lexCharacter(){
 // ===== Merged from lib/Parse/LexerOperators.cpp =====
 
 namespace hyper::parse {
-Token Lexer::lexOperatorOrPunctuation(){
+Token inline Lexer::lexOperatorOrPunctuation(){
  const auto start=tokenStart_;
  const auto two=[&](std::string_view s,TokenKind k){if(input_.substr(cursor_,s.size())==s){for(char c:s)consume();return makeToken(k,start);}return Token{};};
  switch(peek()){
@@ -306,7 +370,7 @@ Token Lexer::lexOperatorOrPunctuation(){
 // ===== Merged from lib/Parse/LexerUnicode.cpp =====
 
 namespace hyper::parse {
-std::uint32_t Lexer::decodeUTF8(SourceOffset off,std::size_t&width)const noexcept{
+std::uint32_t inline Lexer::decodeUTF8(SourceOffset off,std::size_t&width)const noexcept{
  width=0;if(off>=input_.size())return 0;const auto p=[&](std::size_t i){return static_cast<unsigned char>(off+i<input_.size()?input_[off+i]:0);};
  unsigned char b=p(0);
  if(b<0x80){width=1;return b;}
@@ -315,7 +379,7 @@ std::uint32_t Lexer::decodeUTF8(SourceOffset off,std::size_t&width)const noexcep
  if((b&0xf8)==0xf0){if((p(1)&0xc0)!=0x80||(p(2)&0xc0)!=0x80||(p(3)&0xc0)!=0x80)return 0;width=4;auto cp=((b&7)<<18)|((p(1)&0x3f)<<12)|((p(2)&0x3f)<<6)|(p(3)&0x3f);return cp<0x10000||cp>0x10ffff?0:cp;}
  return 0;
 }
-bool Lexer::lexUTF8Identifier(){
+bool inline Lexer::lexUTF8Identifier(){
  std::size_t width=0;auto cp=decodeUTF8(cursor_,width);if(cp==0||width==0)return false;cursor_+=width;column_+=static_cast<SourceColumn>(width);return true;
 }
 }
@@ -324,8 +388,11 @@ bool Lexer::lexUTF8Identifier(){
 // ===== Merged from lib/Parse/LexerDiagnostics.cpp =====
 
 namespace hyper::parse {
-void Lexer::error(std::string message){errorAt(makeToken(TokenKind::Unknown,tokenStart_).range,std::move(message));}
-void Lexer::errorAt(SourceRange range,std::string message){
+void inline Lexer::error(std::string message){errorAt(makeToken(TokenKind::Unknown,tokenStart_).range,std::move(message));}
+void inline Lexer::errorAt(SourceRange range,std::string message){
  LexerDiagnostic d{DiagnosticSeverity::Error,range,std::move(message)};diagnostics_.push_back(d);if(diagnosticHandler_)diagnosticHandler_(diagnostics_.back());
 }
 }
+
+
+#endif
