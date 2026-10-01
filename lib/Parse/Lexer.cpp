@@ -72,7 +72,7 @@ namespace hyper::parse {
 namespace {
 struct KeywordEntry { std::string_view spelling; TokenKind kind; };
 constexpr std::array<KeywordEntry,85> keywordTable={{
-{"function", TokenKind::Keyword},
+{"func", TokenKind::Keyword},
 {"var", TokenKind::Keyword},
 {"const", TokenKind::Keyword},
 {"struct", TokenKind::Keyword},
