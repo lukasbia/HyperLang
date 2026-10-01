@@ -1,7 +1,5 @@
-#include "hyper/Parser.h"
-#include "hyper/ParserDeclaration.h"
-#include "hyper/ParserDiagnostics.h"
-#include "hyper/ParserExpression.h"
+#include "hyper/Parse/Parser.h"
+#include "hyper/Parse/ParserDiagnostics.h"
 
 #include <algorithm>
 #include <cstddef>
