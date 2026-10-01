@@ -1,4 +1,5 @@
 add_subdirectory(Parse)
+add_subdirectory(Compiler)
 add_subdirectory(Sema)
 add_subdirectory(HIL)
 add_subdirectory(HILOptimization)
