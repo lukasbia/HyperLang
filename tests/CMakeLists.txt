@@ -1,0 +1,4 @@
+add_executable(hyperlang_lexer_tests Parse/LexerTests.cpp)
+target_link_libraries(hyperlang_lexer_tests PRIVATE hyper_parse)
+target_compile_features(hyperlang_lexer_tests PRIVATE cxx_std_20)
+add_test(NAME hyperlang_lexer_tests COMMAND hyperlang_lexer_tests)
