@@ -1,8 +1,6 @@
-#include "hyper/Lexer.h"
-#include "hyper/LexerOptions.h"
-#include "hyper/LexerCharacter.h"
-#include "hyper/LexerToken.h"
-#include "hyper/LexerSupport.h"
+#include "hyper/Parse/Lexer.h"
+#include "hyper/Parse/LexerOptions.h"
+#include "hyper/Parse/LexerToken.h"
 
 #include <algorithm>
 #include <cctype>
