@@ -1,0 +1,4 @@
+add_library(HyperHILOptimization STATIC HILOptimization.cpp)
+target_include_directories(HyperHILOptimization PUBLIC \${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(HyperHILOptimization PUBLIC HyperHIL)
+target_compile_features(HyperHILOptimization PUBLIC cxx_std_20)

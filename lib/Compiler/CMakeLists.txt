@@ -1,0 +1,4 @@
+add_library(HyperCompiler STATIC Compiler.cpp)
+target_include_directories(HyperCompiler PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(HyperCompiler PUBLIC HyperParse HyperHIL HyperHILOptimization HyperLLCVM HyperLLCVMOptimization HyperLLCVMBackend)
+target_compile_features(HyperCompiler PUBLIC cxx_std_20)
