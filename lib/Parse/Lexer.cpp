@@ -333,3 +333,19 @@ void inline Lexer::errorAt(SourceRange range,std::string message){
 
 
 
+
+LexerState Lexer::saveState() const noexcept {
+    return LexerState(cursor_, tokenStart_, line_, column_, fatal_, reachedEOF_);
+}
+
+void Lexer::restoreState(const LexerState& state) noexcept {
+    if (!state.isValid())
+        return;
+    cursor_ = state.cursor_;
+    tokenStart_ = state.tokenStart_;
+    line_ = state.line_;
+    column_ = state.column_;
+    fatal_ = state.fatal_;
+    reachedEOF_ = state.reachedEOF_;
+    current_ = {};
+}
