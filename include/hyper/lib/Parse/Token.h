@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <utility>
 namespace hyper::parse {
 enum class TokenKind : std::uint16_t {
     Eof,
