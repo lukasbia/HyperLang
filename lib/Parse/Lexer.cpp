@@ -1,12 +1,15 @@
-#ifndef HYPER_LEXER_SINGLE_FILE_INCLUDED
-#define HYPER_LEXER_SINGLE_FILE_INCLUDED
+#include "hyper/lib/Parse/Lexer.h"
+#include "hyper/lib/Parse/LexerDiagnostics.h"
+#include "hyper/lib/Parse/LexerOptions.h"
+#include "hyper/lib/Parse/LexerState.h"
+#include "hyper/lib/Parse/LexerUnicode.h"
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <limits>
+#include <unordered_map>
+#include <utility>
 
-#include "hyper/lib/Parse/Token.h"
-#include <cstdint>
-#include <functional>
-#include <string>
-#include <string_view>
-#include <vector>
 namespace hyper::parse {
 enum class DiagnosticSeverity : std::uint8_t { Note, Warning, Error, Fatal };
 struct LexerDiagnostic {
@@ -241,7 +244,6 @@ TokenKind inline Lexer::lookupSpecialKeyword(std::string_view s)const noexcept{f
 }
 
 
-// ===== Merged from lib/Parse/LexerLiterals.cpp =====
 
 namespace hyper::parse {
 namespace {
@@ -328,7 +330,6 @@ Token inline Lexer::lexCharacter(){
 }
 
 
-// ===== Merged from lib/Parse/LexerOperators.cpp =====
 
 namespace hyper::parse {
 Token inline Lexer::lexOperatorOrPunctuation(){
@@ -367,7 +368,6 @@ Token inline Lexer::lexOperatorOrPunctuation(){
 }
 
 
-// ===== Merged from lib/Parse/LexerUnicode.cpp =====
 
 namespace hyper::parse {
 std::uint32_t inline Lexer::decodeUTF8(SourceOffset off,std::size_t&width)const noexcept{
@@ -385,7 +385,6 @@ bool inline Lexer::lexUTF8Identifier(){
 }
 
 
-// ===== Merged from lib/Parse/LexerDiagnostics.cpp =====
 
 namespace hyper::parse {
 void inline Lexer::error(std::string message){errorAt(makeToken(TokenKind::Unknown,tokenStart_).range,std::move(message));}
@@ -395,4 +394,3 @@ void inline Lexer::errorAt(SourceRange range,std::string message){
 }
 
 
-#endif
