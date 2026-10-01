@@ -1,4 +1,4 @@
-#include "hyper/lib/Parse/Lexer.cpp"
+#include "hyper/lib/Parse/Lexer.h"
 #include <iostream>
 #include <string>
 int main(int argc,char**argv){
