@@ -1,3 +1,4 @@
+add_subdirectory(AST)
 add_subdirectory(Parse)
 add_subdirectory(Compiler)
 add_subdirectory(Sema)
