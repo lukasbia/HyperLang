@@ -349,3 +349,57 @@ void Lexer::restoreState(const LexerState& state) noexcept {
     reachedEOF_ = state.reachedEOF_;
     current_ = {};
 }
+
+namespace hyper::parse {
+
+bool Lexer::pastCutOff() const noexcept {
+    return lexerCutOffPoint_ != static_cast<SourceOffset>(-1) &&
+           cursor_ >= lexerCutOffPoint_;
+}
+
+void Lexer::flushDiagnostics() {
+    if (!diagnosticHandler_)
+        return;
+    for (const auto &diagnostic : diagnostics_)
+        diagnosticHandler_(diagnostic);
+}
+
+const Token &Lexer::peekNextToken() const noexcept {
+    auto *self = const_cast<Lexer *>(this);
+    const LexerState state = self->saveState();
+    const std::size_t diagnosticCount = self->diagnostics_.size();
+    self->next_ = self->lex();
+    self->restoreState(state);
+    if (self->diagnostics_.size() > diagnosticCount)
+        self->diagnostics_.resize(diagnosticCount);
+    return self->next_;
+}
+
+void Lexer::cutOffLexing() noexcept {
+    if (lexerCutOffPoint_ == static_cast<SourceOffset>(-1) ||
+        lexerCutOffPoint_ > cursor_)
+        lexerCutOffPoint_ = cursor_;
+}
+
+bool Lexer::isCutOff() const noexcept {
+    return lexerCutOffPoint_ != static_cast<SourceOffset>(-1);
+}
+
+LexerMode Lexer::mode() const noexcept {
+    return options_.mode;
+}
+
+bool Lexer::isInterfaceMode() const noexcept {
+    return options_.mode == LexerMode::Interface;
+}
+
+bool Lexer::isHILMode() const noexcept {
+    return options_.mode == LexerMode::HIL;
+}
+
+bool Lexer::isKeepingComments() const noexcept {
+    return options_.preserveComments ||
+           options_.commentRetention == CommentRetentionMode::Preserve;
+}
+
+}
