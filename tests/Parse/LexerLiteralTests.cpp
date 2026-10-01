@@ -1,169 +1,306 @@
 #include "hyper/lib/Parse/Lexer.h"
 #include <iostream>
 using namespace hyper::parse;
-static int failures=0;
-static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
+static int failures=0; static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
 int main(){
-  { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_0"); check(t.text=="0","literal_text_0"); check(l.lex().isEOF(),"literal_eof_0"); }
-  { Lexer l(" 0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_0"); }
-  { Lexer l("1"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_1"); check(t.text=="1","literal_text_1"); check(l.lex().isEOF(),"literal_eof_1"); }
-  { Lexer l(" 1 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_1"); }
-  { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_2"); check(t.text=="42","literal_text_2"); check(l.lex().isEOF(),"literal_eof_2"); }
-  { Lexer l(" 42 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_2"); }
-  { Lexer l("999999"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_3"); check(t.text=="999999","literal_text_3"); check(l.lex().isEOF(),"literal_eof_3"); }
-  { Lexer l(" 999999 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_3"); }
-  { Lexer l("0x0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_4"); check(t.text=="0x0","literal_text_4"); check(l.lex().isEOF(),"literal_eof_4"); }
-  { Lexer l(" 0x0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_4"); }
-  { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_5"); check(t.text=="0xff","literal_text_5"); check(l.lex().isEOF(),"literal_eof_5"); }
-  { Lexer l(" 0xff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_5"); }
-  { Lexer l("0XAB"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_6"); check(t.text=="0XAB","literal_text_6"); check(l.lex().isEOF(),"literal_eof_6"); }
-  { Lexer l(" 0XAB "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_6"); }
-  { Lexer l("0b0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_7"); check(t.text=="0b0","literal_text_7"); check(l.lex().isEOF(),"literal_eof_7"); }
-  { Lexer l(" 0b0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_7"); }
-  { Lexer l("0b10101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_8"); check(t.text=="0b10101","literal_text_8"); check(l.lex().isEOF(),"literal_eof_8"); }
-  { Lexer l(" 0b10101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_8"); }
-  { Lexer l("0o7"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_9"); check(t.text=="0o7","literal_text_9"); check(l.lex().isEOF(),"literal_eof_9"); }
-  { Lexer l(" 0o7 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_9"); }
-  { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_10"); check(t.text=="0o755","literal_text_10"); check(l.lex().isEOF(),"literal_eof_10"); }
-  { Lexer l(" 0o755 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_10"); }
-  { Lexer l("1.0"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_11"); check(t.text=="1.0","literal_text_11"); check(l.lex().isEOF(),"literal_eof_11"); }
-  { Lexer l(" 1.0 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_11"); }
-  { Lexer l("3.14159"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_12"); check(t.text=="3.14159","literal_text_12"); check(l.lex().isEOF(),"literal_eof_12"); }
-  { Lexer l(" 3.14159 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_12"); }
-  { Lexer l("10.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_13"); check(t.text=="10.25","literal_text_13"); check(l.lex().isEOF(),"literal_eof_13"); }
-  { Lexer l(" 10.25 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_13"); }
-  { Lexer l("1e2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_14"); check(t.text=="1e2","literal_text_14"); check(l.lex().isEOF(),"literal_eof_14"); }
-  { Lexer l(" 1e2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_14"); }
-  { Lexer l("1E2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_15"); check(t.text=="1E2","literal_text_15"); check(l.lex().isEOF(),"literal_eof_15"); }
-  { Lexer l(" 1E2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_15"); }
-  { Lexer l("1.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_16"); check(t.text=="1.5e-2","literal_text_16"); check(l.lex().isEOF(),"literal_eof_16"); }
-  { Lexer l(" 1.5e-2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_16"); }
-  { Lexer l("1.5E+2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_17"); check(t.text=="1.5E+2","literal_text_17"); check(l.lex().isEOF(),"literal_eof_17"); }
-  { Lexer l(" 1.5E+2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_17"); }
-  { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_18"); check(t.text=="10_000","literal_text_18"); check(l.lex().isEOF(),"literal_eof_18"); }
-  { Lexer l(" 10_000 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_18"); }
-  { Lexer l("0xff_ff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_19"); check(t.text=="0xff_ff","literal_text_19"); check(l.lex().isEOF(),"literal_eof_19"); }
-  { Lexer l(" 0xff_ff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_19"); }
-  { Lexer l("0b1010_0101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_20"); check(t.text=="0b1010_0101","literal_text_20"); check(l.lex().isEOF(),"literal_eof_20"); }
-  { Lexer l(" 0b1010_0101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_20"); }
-  { Lexer l("0o7_55"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_21"); check(t.text=="0o7_55","literal_text_21"); check(l.lex().isEOF(),"literal_eof_21"); }
-  { Lexer l(" 0o7_55 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_21"); }
-  { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_22"); check(t.text=="0","literal_text_22"); check(l.lex().isEOF(),"literal_eof_22"); }
-  { Lexer l(" 0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_22"); }
-  { Lexer l("1"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_23"); check(t.text=="1","literal_text_23"); check(l.lex().isEOF(),"literal_eof_23"); }
-  { Lexer l(" 1 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_23"); }
-  { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_24"); check(t.text=="42","literal_text_24"); check(l.lex().isEOF(),"literal_eof_24"); }
-  { Lexer l(" 42 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_24"); }
-  { Lexer l("999999"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_25"); check(t.text=="999999","literal_text_25"); check(l.lex().isEOF(),"literal_eof_25"); }
-  { Lexer l(" 999999 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_25"); }
-  { Lexer l("0x0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_26"); check(t.text=="0x0","literal_text_26"); check(l.lex().isEOF(),"literal_eof_26"); }
-  { Lexer l(" 0x0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_26"); }
-  { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_27"); check(t.text=="0xff","literal_text_27"); check(l.lex().isEOF(),"literal_eof_27"); }
-  { Lexer l(" 0xff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_27"); }
-  { Lexer l("0XAB"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_28"); check(t.text=="0XAB","literal_text_28"); check(l.lex().isEOF(),"literal_eof_28"); }
-  { Lexer l(" 0XAB "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_28"); }
-  { Lexer l("0b0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_29"); check(t.text=="0b0","literal_text_29"); check(l.lex().isEOF(),"literal_eof_29"); }
-  { Lexer l(" 0b0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_29"); }
-  { Lexer l("0b10101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_30"); check(t.text=="0b10101","literal_text_30"); check(l.lex().isEOF(),"literal_eof_30"); }
-  { Lexer l(" 0b10101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_30"); }
-  { Lexer l("0o7"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_31"); check(t.text=="0o7","literal_text_31"); check(l.lex().isEOF(),"literal_eof_31"); }
-  { Lexer l(" 0o7 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_31"); }
-  { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_32"); check(t.text=="0o755","literal_text_32"); check(l.lex().isEOF(),"literal_eof_32"); }
-  { Lexer l(" 0o755 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_32"); }
-  { Lexer l("1.0"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_33"); check(t.text=="1.0","literal_text_33"); check(l.lex().isEOF(),"literal_eof_33"); }
-  { Lexer l(" 1.0 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_33"); }
-  { Lexer l("3.14159"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_34"); check(t.text=="3.14159","literal_text_34"); check(l.lex().isEOF(),"literal_eof_34"); }
-  { Lexer l(" 3.14159 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_34"); }
-  { Lexer l("10.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_35"); check(t.text=="10.25","literal_text_35"); check(l.lex().isEOF(),"literal_eof_35"); }
-  { Lexer l(" 10.25 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_35"); }
-  { Lexer l("1e2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_36"); check(t.text=="1e2","literal_text_36"); check(l.lex().isEOF(),"literal_eof_36"); }
-  { Lexer l(" 1e2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_36"); }
-  { Lexer l("1E2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_37"); check(t.text=="1E2","literal_text_37"); check(l.lex().isEOF(),"literal_eof_37"); }
-  { Lexer l(" 1E2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_37"); }
-  { Lexer l("1.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_38"); check(t.text=="1.5e-2","literal_text_38"); check(l.lex().isEOF(),"literal_eof_38"); }
-  { Lexer l(" 1.5e-2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_38"); }
-  { Lexer l("1.5E+2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_39"); check(t.text=="1.5E+2","literal_text_39"); check(l.lex().isEOF(),"literal_eof_39"); }
-  { Lexer l(" 1.5E+2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_39"); }
-  { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_40"); check(t.text=="10_000","literal_text_40"); check(l.lex().isEOF(),"literal_eof_40"); }
-  { Lexer l(" 10_000 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_40"); }
-  { Lexer l("0xff_ff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_41"); check(t.text=="0xff_ff","literal_text_41"); check(l.lex().isEOF(),"literal_eof_41"); }
-  { Lexer l(" 0xff_ff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_41"); }
-  { Lexer l("0b1010_0101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_42"); check(t.text=="0b1010_0101","literal_text_42"); check(l.lex().isEOF(),"literal_eof_42"); }
-  { Lexer l(" 0b1010_0101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_42"); }
-  { Lexer l("0o7_55"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_43"); check(t.text=="0o7_55","literal_text_43"); check(l.lex().isEOF(),"literal_eof_43"); }
-  { Lexer l(" 0o7_55 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_43"); }
-  { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_44"); check(t.text=="0","literal_text_44"); check(l.lex().isEOF(),"literal_eof_44"); }
-  { Lexer l(" 0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_44"); }
-  { Lexer l("1"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_45"); check(t.text=="1","literal_text_45"); check(l.lex().isEOF(),"literal_eof_45"); }
-  { Lexer l(" 1 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_45"); }
-  { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_46"); check(t.text=="42","literal_text_46"); check(l.lex().isEOF(),"literal_eof_46"); }
-  { Lexer l(" 42 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_46"); }
-  { Lexer l("999999"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_47"); check(t.text=="999999","literal_text_47"); check(l.lex().isEOF(),"literal_eof_47"); }
-  { Lexer l(" 999999 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_47"); }
-  { Lexer l("0x0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_48"); check(t.text=="0x0","literal_text_48"); check(l.lex().isEOF(),"literal_eof_48"); }
-  { Lexer l(" 0x0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_48"); }
-  { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_49"); check(t.text=="0xff","literal_text_49"); check(l.lex().isEOF(),"literal_eof_49"); }
-  { Lexer l(" 0xff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_49"); }
-  { Lexer l("0XAB"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_50"); check(t.text=="0XAB","literal_text_50"); check(l.lex().isEOF(),"literal_eof_50"); }
-  { Lexer l(" 0XAB "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_50"); }
-  { Lexer l("0b0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_51"); check(t.text=="0b0","literal_text_51"); check(l.lex().isEOF(),"literal_eof_51"); }
-  { Lexer l(" 0b0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_51"); }
-  { Lexer l("0b10101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_52"); check(t.text=="0b10101","literal_text_52"); check(l.lex().isEOF(),"literal_eof_52"); }
-  { Lexer l(" 0b10101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_52"); }
-  { Lexer l("0o7"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_53"); check(t.text=="0o7","literal_text_53"); check(l.lex().isEOF(),"literal_eof_53"); }
-  { Lexer l(" 0o7 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_53"); }
-  { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_54"); check(t.text=="0o755","literal_text_54"); check(l.lex().isEOF(),"literal_eof_54"); }
-  { Lexer l(" 0o755 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_54"); }
-  { Lexer l("1.0"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_55"); check(t.text=="1.0","literal_text_55"); check(l.lex().isEOF(),"literal_eof_55"); }
-  { Lexer l(" 1.0 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_55"); }
-  { Lexer l("3.14159"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_56"); check(t.text=="3.14159","literal_text_56"); check(l.lex().isEOF(),"literal_eof_56"); }
-  { Lexer l(" 3.14159 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_56"); }
-  { Lexer l("10.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_57"); check(t.text=="10.25","literal_text_57"); check(l.lex().isEOF(),"literal_eof_57"); }
-  { Lexer l(" 10.25 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_57"); }
-  { Lexer l("1e2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_58"); check(t.text=="1e2","literal_text_58"); check(l.lex().isEOF(),"literal_eof_58"); }
-  { Lexer l(" 1e2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_58"); }
-  { Lexer l("1E2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_59"); check(t.text=="1E2","literal_text_59"); check(l.lex().isEOF(),"literal_eof_59"); }
-  { Lexer l(" 1E2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_59"); }
-  { Lexer l("1.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_60"); check(t.text=="1.5e-2","literal_text_60"); check(l.lex().isEOF(),"literal_eof_60"); }
-  { Lexer l(" 1.5e-2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_60"); }
-  { Lexer l("1.5E+2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_61"); check(t.text=="1.5E+2","literal_text_61"); check(l.lex().isEOF(),"literal_eof_61"); }
-  { Lexer l(" 1.5E+2 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_61"); }
-  { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_62"); check(t.text=="10_000","literal_text_62"); check(l.lex().isEOF(),"literal_eof_62"); }
-  { Lexer l(" 10_000 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_62"); }
-  { Lexer l("0xff_ff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_63"); check(t.text=="0xff_ff","literal_text_63"); check(l.lex().isEOF(),"literal_eof_63"); }
-  { Lexer l(" 0xff_ff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_63"); }
-  { Lexer l("0b1010_0101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_64"); check(t.text=="0b1010_0101","literal_text_64"); check(l.lex().isEOF(),"literal_eof_64"); }
-  { Lexer l(" 0b1010_0101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_64"); }
-  { Lexer l("0o7_55"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_65"); check(t.text=="0o7_55","literal_text_65"); check(l.lex().isEOF(),"literal_eof_65"); }
-  { Lexer l(" 0o7_55 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_65"); }
-  { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_66"); check(t.text=="0","literal_text_66"); check(l.lex().isEOF(),"literal_eof_66"); }
-  { Lexer l(" 0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_66"); }
-  { Lexer l("1"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_67"); check(t.text=="1","literal_text_67"); check(l.lex().isEOF(),"literal_eof_67"); }
-  { Lexer l(" 1 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_67"); }
-  { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_68"); check(t.text=="42","literal_text_68"); check(l.lex().isEOF(),"literal_eof_68"); }
-  { Lexer l(" 42 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_68"); }
-  { Lexer l("999999"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_69"); check(t.text=="999999","literal_text_69"); check(l.lex().isEOF(),"literal_eof_69"); }
-  { Lexer l(" 999999 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_69"); }
-  { Lexer l("0x0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_70"); check(t.text=="0x0","literal_text_70"); check(l.lex().isEOF(),"literal_eof_70"); }
-  { Lexer l(" 0x0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_70"); }
-  { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_71"); check(t.text=="0xff","literal_text_71"); check(l.lex().isEOF(),"literal_eof_71"); }
-  { Lexer l(" 0xff "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_71"); }
-  { Lexer l("0XAB"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_72"); check(t.text=="0XAB","literal_text_72"); check(l.lex().isEOF(),"literal_eof_72"); }
-  { Lexer l(" 0XAB "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_72"); }
-  { Lexer l("0b0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_73"); check(t.text=="0b0","literal_text_73"); check(l.lex().isEOF(),"literal_eof_73"); }
-  { Lexer l(" 0b0 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_73"); }
-  { Lexer l("0b10101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_74"); check(t.text=="0b10101","literal_text_74"); check(l.lex().isEOF(),"literal_eof_74"); }
-  { Lexer l(" 0b10101 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_74"); }
-  { Lexer l("0o7"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_75"); check(t.text=="0o7","literal_text_75"); check(l.lex().isEOF(),"literal_eof_75"); }
-  { Lexer l(" 0o7 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_75"); }
-  { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_76"); check(t.text=="0o755","literal_text_76"); check(l.lex().isEOF(),"literal_eof_76"); }
-  { Lexer l(" 0o755 "); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"literal_space_76"); }
-  { Lexer l("1.0"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_77"); check(t.text=="1.0","literal_text_77"); check(l.lex().isEOF(),"literal_eof_77"); }
-  { Lexer l(" 1.0 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_77"); }
-  { Lexer l("3.14159"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_78"); check(t.text=="3.14159","literal_text_78"); check(l.lex().isEOF(),"literal_eof_78"); }
-  { Lexer l(" 3.14159 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_78"); }
-  { Lexer l("10.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_79"); check(t.text=="10.25","literal_text_79"); check(l.lex().isEOF(),"literal_eof_79"); }
-  { Lexer l(" 10.25 "); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"literal_space_79"); }
-
-  return failures?1:0;
-}
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_0"); check(t.text=="0","lit_text_0"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_1"); check(t.text=="42","lit_text_1"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_2"); check(t.text=="0xff","lit_text_2"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_3"); check(t.text=="0b101","lit_text_3"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_4"); check(t.text=="0o755","lit_text_4"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_5"); check(t.text=="1.25","lit_text_5"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_6"); check(t.text=="2e10","lit_text_6"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_7"); check(t.text=="3.5e-2","lit_text_7"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_8"); check(t.text=="10_000","lit_text_8"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_9"); check(t.text=="0","lit_text_9"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_10"); check(t.text=="42","lit_text_10"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_11"); check(t.text=="0xff","lit_text_11"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_12"); check(t.text=="0b101","lit_text_12"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_13"); check(t.text=="0o755","lit_text_13"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_14"); check(t.text=="1.25","lit_text_14"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_15"); check(t.text=="2e10","lit_text_15"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_16"); check(t.text=="3.5e-2","lit_text_16"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_17"); check(t.text=="10_000","lit_text_17"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_18"); check(t.text=="0","lit_text_18"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_19"); check(t.text=="42","lit_text_19"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_20"); check(t.text=="0xff","lit_text_20"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_21"); check(t.text=="0b101","lit_text_21"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_22"); check(t.text=="0o755","lit_text_22"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_23"); check(t.text=="1.25","lit_text_23"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_24"); check(t.text=="2e10","lit_text_24"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_25"); check(t.text=="3.5e-2","lit_text_25"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_26"); check(t.text=="10_000","lit_text_26"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_27"); check(t.text=="0","lit_text_27"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_28"); check(t.text=="42","lit_text_28"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_29"); check(t.text=="0xff","lit_text_29"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_30"); check(t.text=="0b101","lit_text_30"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_31"); check(t.text=="0o755","lit_text_31"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_32"); check(t.text=="1.25","lit_text_32"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_33"); check(t.text=="2e10","lit_text_33"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_34"); check(t.text=="3.5e-2","lit_text_34"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_35"); check(t.text=="10_000","lit_text_35"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_36"); check(t.text=="0","lit_text_36"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_37"); check(t.text=="42","lit_text_37"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_38"); check(t.text=="0xff","lit_text_38"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_39"); check(t.text=="0b101","lit_text_39"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_40"); check(t.text=="0o755","lit_text_40"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_41"); check(t.text=="1.25","lit_text_41"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_42"); check(t.text=="2e10","lit_text_42"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_43"); check(t.text=="3.5e-2","lit_text_43"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_44"); check(t.text=="10_000","lit_text_44"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_45"); check(t.text=="0","lit_text_45"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_46"); check(t.text=="42","lit_text_46"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_47"); check(t.text=="0xff","lit_text_47"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_48"); check(t.text=="0b101","lit_text_48"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_49"); check(t.text=="0o755","lit_text_49"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_50"); check(t.text=="1.25","lit_text_50"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_51"); check(t.text=="2e10","lit_text_51"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_52"); check(t.text=="3.5e-2","lit_text_52"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_53"); check(t.text=="10_000","lit_text_53"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_54"); check(t.text=="0","lit_text_54"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_55"); check(t.text=="42","lit_text_55"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_56"); check(t.text=="0xff","lit_text_56"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_57"); check(t.text=="0b101","lit_text_57"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_58"); check(t.text=="0o755","lit_text_58"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_59"); check(t.text=="1.25","lit_text_59"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_60"); check(t.text=="2e10","lit_text_60"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_61"); check(t.text=="3.5e-2","lit_text_61"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_62"); check(t.text=="10_000","lit_text_62"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_63"); check(t.text=="0","lit_text_63"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_64"); check(t.text=="42","lit_text_64"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_65"); check(t.text=="0xff","lit_text_65"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_66"); check(t.text=="0b101","lit_text_66"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_67"); check(t.text=="0o755","lit_text_67"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_68"); check(t.text=="1.25","lit_text_68"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_69"); check(t.text=="2e10","lit_text_69"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_70"); check(t.text=="3.5e-2","lit_text_70"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_71"); check(t.text=="10_000","lit_text_71"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_72"); check(t.text=="0","lit_text_72"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_73"); check(t.text=="42","lit_text_73"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_74"); check(t.text=="0xff","lit_text_74"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_75"); check(t.text=="0b101","lit_text_75"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_76"); check(t.text=="0o755","lit_text_76"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_77"); check(t.text=="1.25","lit_text_77"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_78"); check(t.text=="2e10","lit_text_78"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_79"); check(t.text=="3.5e-2","lit_text_79"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_80"); check(t.text=="10_000","lit_text_80"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_81"); check(t.text=="0","lit_text_81"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_82"); check(t.text=="42","lit_text_82"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_83"); check(t.text=="0xff","lit_text_83"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_84"); check(t.text=="0b101","lit_text_84"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_85"); check(t.text=="0o755","lit_text_85"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_86"); check(t.text=="1.25","lit_text_86"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_87"); check(t.text=="2e10","lit_text_87"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_88"); check(t.text=="3.5e-2","lit_text_88"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_89"); check(t.text=="10_000","lit_text_89"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_90"); check(t.text=="0","lit_text_90"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_91"); check(t.text=="42","lit_text_91"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_92"); check(t.text=="0xff","lit_text_92"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_93"); check(t.text=="0b101","lit_text_93"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_94"); check(t.text=="0o755","lit_text_94"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_95"); check(t.text=="1.25","lit_text_95"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_96"); check(t.text=="2e10","lit_text_96"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_97"); check(t.text=="3.5e-2","lit_text_97"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_98"); check(t.text=="10_000","lit_text_98"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_99"); check(t.text=="0","lit_text_99"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_100"); check(t.text=="42","lit_text_100"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_101"); check(t.text=="0xff","lit_text_101"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_102"); check(t.text=="0b101","lit_text_102"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_103"); check(t.text=="0o755","lit_text_103"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_104"); check(t.text=="1.25","lit_text_104"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_105"); check(t.text=="2e10","lit_text_105"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_106"); check(t.text=="3.5e-2","lit_text_106"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_107"); check(t.text=="10_000","lit_text_107"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_108"); check(t.text=="0","lit_text_108"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_109"); check(t.text=="42","lit_text_109"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_110"); check(t.text=="0xff","lit_text_110"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_111"); check(t.text=="0b101","lit_text_111"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_112"); check(t.text=="0o755","lit_text_112"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_113"); check(t.text=="1.25","lit_text_113"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_114"); check(t.text=="2e10","lit_text_114"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_115"); check(t.text=="3.5e-2","lit_text_115"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_116"); check(t.text=="10_000","lit_text_116"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_117"); check(t.text=="0","lit_text_117"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_118"); check(t.text=="42","lit_text_118"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_119"); check(t.text=="0xff","lit_text_119"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_120"); check(t.text=="0b101","lit_text_120"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_121"); check(t.text=="0o755","lit_text_121"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_122"); check(t.text=="1.25","lit_text_122"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_123"); check(t.text=="2e10","lit_text_123"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_124"); check(t.text=="3.5e-2","lit_text_124"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_125"); check(t.text=="10_000","lit_text_125"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_126"); check(t.text=="0","lit_text_126"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_127"); check(t.text=="42","lit_text_127"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_128"); check(t.text=="0xff","lit_text_128"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_129"); check(t.text=="0b101","lit_text_129"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_130"); check(t.text=="0o755","lit_text_130"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_131"); check(t.text=="1.25","lit_text_131"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_132"); check(t.text=="2e10","lit_text_132"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_133"); check(t.text=="3.5e-2","lit_text_133"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_134"); check(t.text=="10_000","lit_text_134"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_135"); check(t.text=="0","lit_text_135"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_136"); check(t.text=="42","lit_text_136"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_137"); check(t.text=="0xff","lit_text_137"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_138"); check(t.text=="0b101","lit_text_138"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_139"); check(t.text=="0o755","lit_text_139"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_140"); check(t.text=="1.25","lit_text_140"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_141"); check(t.text=="2e10","lit_text_141"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_142"); check(t.text=="3.5e-2","lit_text_142"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_143"); check(t.text=="10_000","lit_text_143"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_144"); check(t.text=="0","lit_text_144"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_145"); check(t.text=="42","lit_text_145"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_146"); check(t.text=="0xff","lit_text_146"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_147"); check(t.text=="0b101","lit_text_147"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_148"); check(t.text=="0o755","lit_text_148"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_149"); check(t.text=="1.25","lit_text_149"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_150"); check(t.text=="2e10","lit_text_150"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_151"); check(t.text=="3.5e-2","lit_text_151"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_152"); check(t.text=="10_000","lit_text_152"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_153"); check(t.text=="0","lit_text_153"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_154"); check(t.text=="42","lit_text_154"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_155"); check(t.text=="0xff","lit_text_155"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_156"); check(t.text=="0b101","lit_text_156"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_157"); check(t.text=="0o755","lit_text_157"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_158"); check(t.text=="1.25","lit_text_158"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_159"); check(t.text=="2e10","lit_text_159"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_160"); check(t.text=="3.5e-2","lit_text_160"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_161"); check(t.text=="10_000","lit_text_161"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_162"); check(t.text=="0","lit_text_162"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_163"); check(t.text=="42","lit_text_163"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_164"); check(t.text=="0xff","lit_text_164"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_165"); check(t.text=="0b101","lit_text_165"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_166"); check(t.text=="0o755","lit_text_166"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_167"); check(t.text=="1.25","lit_text_167"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_168"); check(t.text=="2e10","lit_text_168"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_169"); check(t.text=="3.5e-2","lit_text_169"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_170"); check(t.text=="10_000","lit_text_170"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_171"); check(t.text=="0","lit_text_171"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_172"); check(t.text=="42","lit_text_172"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_173"); check(t.text=="0xff","lit_text_173"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_174"); check(t.text=="0b101","lit_text_174"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_175"); check(t.text=="0o755","lit_text_175"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_176"); check(t.text=="1.25","lit_text_176"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_177"); check(t.text=="2e10","lit_text_177"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_178"); check(t.text=="3.5e-2","lit_text_178"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_179"); check(t.text=="10_000","lit_text_179"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_180"); check(t.text=="0","lit_text_180"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_181"); check(t.text=="42","lit_text_181"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_182"); check(t.text=="0xff","lit_text_182"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_183"); check(t.text=="0b101","lit_text_183"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_184"); check(t.text=="0o755","lit_text_184"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_185"); check(t.text=="1.25","lit_text_185"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_186"); check(t.text=="2e10","lit_text_186"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_187"); check(t.text=="3.5e-2","lit_text_187"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_188"); check(t.text=="10_000","lit_text_188"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_189"); check(t.text=="0","lit_text_189"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_190"); check(t.text=="42","lit_text_190"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_191"); check(t.text=="0xff","lit_text_191"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_192"); check(t.text=="0b101","lit_text_192"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_193"); check(t.text=="0o755","lit_text_193"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_194"); check(t.text=="1.25","lit_text_194"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_195"); check(t.text=="2e10","lit_text_195"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_196"); check(t.text=="3.5e-2","lit_text_196"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_197"); check(t.text=="10_000","lit_text_197"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_198"); check(t.text=="0","lit_text_198"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_199"); check(t.text=="42","lit_text_199"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_200"); check(t.text=="0xff","lit_text_200"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_201"); check(t.text=="0b101","lit_text_201"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_202"); check(t.text=="0o755","lit_text_202"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_203"); check(t.text=="1.25","lit_text_203"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_204"); check(t.text=="2e10","lit_text_204"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_205"); check(t.text=="3.5e-2","lit_text_205"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_206"); check(t.text=="10_000","lit_text_206"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_207"); check(t.text=="0","lit_text_207"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_208"); check(t.text=="42","lit_text_208"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_209"); check(t.text=="0xff","lit_text_209"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_210"); check(t.text=="0b101","lit_text_210"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_211"); check(t.text=="0o755","lit_text_211"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_212"); check(t.text=="1.25","lit_text_212"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_213"); check(t.text=="2e10","lit_text_213"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_214"); check(t.text=="3.5e-2","lit_text_214"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_215"); check(t.text=="10_000","lit_text_215"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_216"); check(t.text=="0","lit_text_216"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_217"); check(t.text=="42","lit_text_217"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_218"); check(t.text=="0xff","lit_text_218"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_219"); check(t.text=="0b101","lit_text_219"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_220"); check(t.text=="0o755","lit_text_220"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_221"); check(t.text=="1.25","lit_text_221"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_222"); check(t.text=="2e10","lit_text_222"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_223"); check(t.text=="3.5e-2","lit_text_223"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_224"); check(t.text=="10_000","lit_text_224"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_225"); check(t.text=="0","lit_text_225"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_226"); check(t.text=="42","lit_text_226"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_227"); check(t.text=="0xff","lit_text_227"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_228"); check(t.text=="0b101","lit_text_228"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_229"); check(t.text=="0o755","lit_text_229"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_230"); check(t.text=="1.25","lit_text_230"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_231"); check(t.text=="2e10","lit_text_231"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_232"); check(t.text=="3.5e-2","lit_text_232"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_233"); check(t.text=="10_000","lit_text_233"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_234"); check(t.text=="0","lit_text_234"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_235"); check(t.text=="42","lit_text_235"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_236"); check(t.text=="0xff","lit_text_236"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_237"); check(t.text=="0b101","lit_text_237"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_238"); check(t.text=="0o755","lit_text_238"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_239"); check(t.text=="1.25","lit_text_239"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_240"); check(t.text=="2e10","lit_text_240"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_241"); check(t.text=="3.5e-2","lit_text_241"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_242"); check(t.text=="10_000","lit_text_242"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_243"); check(t.text=="0","lit_text_243"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_244"); check(t.text=="42","lit_text_244"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_245"); check(t.text=="0xff","lit_text_245"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_246"); check(t.text=="0b101","lit_text_246"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_247"); check(t.text=="0o755","lit_text_247"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_248"); check(t.text=="1.25","lit_text_248"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_249"); check(t.text=="2e10","lit_text_249"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_250"); check(t.text=="3.5e-2","lit_text_250"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_251"); check(t.text=="10_000","lit_text_251"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_252"); check(t.text=="0","lit_text_252"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_253"); check(t.text=="42","lit_text_253"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_254"); check(t.text=="0xff","lit_text_254"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_255"); check(t.text=="0b101","lit_text_255"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_256"); check(t.text=="0o755","lit_text_256"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_257"); check(t.text=="1.25","lit_text_257"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_258"); check(t.text=="2e10","lit_text_258"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_259"); check(t.text=="3.5e-2","lit_text_259"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_260"); check(t.text=="10_000","lit_text_260"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_261"); check(t.text=="0","lit_text_261"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_262"); check(t.text=="42","lit_text_262"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_263"); check(t.text=="0xff","lit_text_263"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_264"); check(t.text=="0b101","lit_text_264"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_265"); check(t.text=="0o755","lit_text_265"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_266"); check(t.text=="1.25","lit_text_266"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_267"); check(t.text=="2e10","lit_text_267"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_268"); check(t.text=="3.5e-2","lit_text_268"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_269"); check(t.text=="10_000","lit_text_269"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_270"); check(t.text=="0","lit_text_270"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_271"); check(t.text=="42","lit_text_271"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_272"); check(t.text=="0xff","lit_text_272"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_273"); check(t.text=="0b101","lit_text_273"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_274"); check(t.text=="0o755","lit_text_274"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_275"); check(t.text=="1.25","lit_text_275"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_276"); check(t.text=="2e10","lit_text_276"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_277"); check(t.text=="3.5e-2","lit_text_277"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_278"); check(t.text=="10_000","lit_text_278"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_279"); check(t.text=="0","lit_text_279"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_280"); check(t.text=="42","lit_text_280"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_281"); check(t.text=="0xff","lit_text_281"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_282"); check(t.text=="0b101","lit_text_282"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_283"); check(t.text=="0o755","lit_text_283"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_284"); check(t.text=="1.25","lit_text_284"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_285"); check(t.text=="2e10","lit_text_285"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_286"); check(t.text=="3.5e-2","lit_text_286"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_287"); check(t.text=="10_000","lit_text_287"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_288"); check(t.text=="0","lit_text_288"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_289"); check(t.text=="42","lit_text_289"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_290"); check(t.text=="0xff","lit_text_290"); }
+ { Lexer l("0b101"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_291"); check(t.text=="0b101","lit_text_291"); }
+ { Lexer l("0o755"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_292"); check(t.text=="0o755","lit_text_292"); }
+ { Lexer l("1.25"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_293"); check(t.text=="1.25","lit_text_293"); }
+ { Lexer l("2e10"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_294"); check(t.text=="2e10","lit_text_294"); }
+ { Lexer l("3.5e-2"); auto t=l.lex(); check(t.kind==TokenKind::FloatingLiteral,"lit_295"); check(t.text=="3.5e-2","lit_text_295"); }
+ { Lexer l("10_000"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_296"); check(t.text=="10_000","lit_text_296"); }
+ { Lexer l("0"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_297"); check(t.text=="0","lit_text_297"); }
+ { Lexer l("42"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_298"); check(t.text=="42","lit_text_298"); }
+ { Lexer l("0xff"); auto t=l.lex(); check(t.kind==TokenKind::IntegerLiteral,"lit_299"); check(t.text=="0xff","lit_text_299"); }
+ return failures?1:0; }
