@@ -35,7 +35,7 @@ private:
  SourceLocation locationFromOffset(std::size_t) const; Token makeToken(TokenKind,std::size_t,SourceLocation,bool=false) const;
  void diagnose(LexerDiagnostic::Severity,SourceLocation,std::string,std::string={});
  void diagnoseError(SourceLocation,std::string,std::string={}); void diagnoseWarning(SourceLocation,std::string,std::string={});
- bool isWhitespaceAt(std::size_t) const; bool isLineBreakAt(std::size_t) const;
+ bool isWhitespaceAt(std::size_t) const noexcept; bool isLineBreakAt(std::size_t) const noexcept;
  bool lexLineComment(); bool lexBlockComment(); bool lexHashbang(); bool lexConflictMarker(); bool lexCommentTrivia(); void consumeTrivia();
  Token lexIdentifierOrKeyword(); Token lexEscapedIdentifier(); Token lexDollarIdentifier();
  bool scanDecimalDigits(std::size_t&,bool,std::size_t&,bool&); bool scanBasedDigits(std::size_t&,NumberBase,std::size_t&,bool&);
@@ -43,17 +43,17 @@ private:
  bool scanUnicodeEscape(std::size_t&,std::uint32_t&); bool scanEscapeSequence(std::size_t&,std::string&,bool&);
  bool scanStringDelimiter(std::size_t&,bool&); bool scanInterpolatedExpression(std::size_t,std::size_t&);
  Token lexString(); Token lexRawString(unsigned); Token lexCharacter(); Token lexDirective(); Token lexHashConstruct();
- bool looksLikeEditorPlaceholder(std::string_view) const; bool looksLikeDirective(std::string_view) const; bool looksLikeConflictMarker(std::string_view) const;
- Token lexRegex(); Token lexOperator(); OperatorBinding classifyOperatorBinding(std::string_view,std::size_t,std::size_t) const; Token lexUnknown();
+ bool looksLikeEditorPlaceholder(std::string_view) noexcept; bool looksLikeDirective(std::string_view) noexcept; bool looksLikeConflictMarker(std::string_view) noexcept;
+ Token lexRegex(); Token lexOperator(); OperatorBinding classifyOperatorBinding(std::string_view,std::size_t,std::size_t) noexcept; Token lexUnknown();
  void invalidateLookahead();
  static bool isIdentifier(std::string_view); static bool isOperator(std::string_view); static bool isValidEscapedIdentifier(std::string_view);
- static bool isEscapedIdentifierEntirelyWhitespace(std::string_view); static bool isASCIIIdentifierStart(char); static bool isASCIIIdentifierContinue(char);
- static bool isASCIIDigit(char); static bool isASCIIHexDigit(char); static bool isASCIIOctalDigit(char); static bool isASCIIWhitespace(char);
- static bool isPrintableASCII(char); static bool isUnicodeIdentifierStart(std::uint32_t); static bool isUnicodeIdentifierContinue(std::uint32_t);
- static bool isRawIdentifierWhitespace(std::uint32_t); static bool isForbiddenIdentifierCodePoint(std::uint32_t);
- static bool isOperatorCharacter(char); static bool isOperatorStartCharacter(char); static bool isOperatorContinuationCharacter(char);
+ static bool isEscapedIdentifierEntirelyWhitespace(std::string_view); static bool isASCIIIdentifierStart(char) noexcept; static bool isASCIIIdentifierContinue(char) noexcept;
+ static bool isASCIIDigit(char) noexcept; static bool isASCIIHexDigit(char) noexcept; static bool isASCIIOctalDigit(char) noexcept; static bool isASCIIWhitespace(char) noexcept;
+ static bool isPrintableASCII(char) noexcept; static bool isUnicodeIdentifierStart(std::uint32_t) noexcept; static bool isUnicodeIdentifierContinue(std::uint32_t) noexcept;
+ static bool isRawIdentifierWhitespace(std::uint32_t) noexcept; static bool isForbiddenIdentifierCodePoint(std::uint32_t) noexcept;
+ static bool isOperatorCharacter(char) noexcept; static bool isOperatorStartCharacter(char) noexcept; static bool isOperatorContinuationCharacter(char) noexcept;
  static bool encodeUTF8(std::uint32_t,std::string&); static std::uint32_t validateUTF8Character(std::string_view,std::size_t&);
- static TokenKind keywordKind(std::string_view); static TokenKind punctuationKind(std::string_view); static TokenKind operatorKind(std::string_view);
+ static TokenKind keywordKind(std::string_view) noexcept; static TokenKind punctuationKind(std::string_view) noexcept; static TokenKind operatorKind(std::string_view) noexcept;
 };
 const char* tokenKindName(TokenKind) noexcept;
 } // namespace hyper
