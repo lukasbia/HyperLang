@@ -1,19 +1,38 @@
 #pragma once
 
+#include "hyper/Parse/SourceLocation.h"
+#include "hyper/Parse/TokenKind.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
 
 namespace hyper {
 
-enum class TokenKind : std::uint16_t;
-enum class OperatorBinding : std::uint8_t;
-enum class NumberBase : std::uint8_t;
-enum class StringKind : std::uint8_t;
-struct SourceLocation;
+enum class OperatorBinding : std::uint8_t {
+    None,
+    Prefix,
+    Postfix,
+    Binary,
+    Assignment
+};
+
+enum class NumberBase : std::uint8_t {
+    Decimal,
+    Binary,
+    Octal,
+    Hexadecimal
+};
+
+enum class StringKind : std::uint8_t {
+    Normal,
+    Multiline,
+    Raw,
+    Interpolated
+};
 
 struct NumericLiteralInfo {
-    NumberBase base{};
+    NumberBase base = NumberBase::Decimal;
     bool hasDecimalPoint = false;
     bool hasExponent = false;
     bool exponentIsBinary = false;
@@ -28,7 +47,7 @@ struct NumericLiteralInfo {
 };
 
 struct StringLiteralInfo {
-    StringKind kind{};
+    StringKind kind = StringKind::Normal;
     unsigned customDelimiterLength = 0;
     bool hasInterpolation = false;
     bool hasEscapes = false;
@@ -38,10 +57,10 @@ struct StringLiteralInfo {
 };
 
 struct Token {
-    TokenKind kind{};
+    TokenKind kind = TokenKind::Unknown;
     std::string text;
-    SourceLocation location{};
-    OperatorBinding binding{};
+    SourceLocation location;
+    OperatorBinding binding = OperatorBinding::None;
     NumericLiteralInfo numeric{};
     StringLiteralInfo string{};
     bool atStartOfLine = false;

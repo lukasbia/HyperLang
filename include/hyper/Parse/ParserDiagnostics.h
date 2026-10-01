@@ -1,23 +1,18 @@
 #pragma once
 
+#include "hyper/Parse/SourceLocation.h"
+
 #include <cstddef>
 #include <string>
 #include <vector>
 
 namespace hyper {
 
-struct SourceLocation;
-
 struct ParseDiagnostic {
-    enum class Severity {
-        Note,
-        Warning,
-        Error,
-        Fatal
-    };
+    enum class Severity { Note, Warning, Error, Fatal };
 
     Severity severity = Severity::Error;
-    SourceLocation* location = nullptr;
+    SourceLocation location;
     std::string message;
     std::string fixIt;
     std::string category;
@@ -27,26 +22,11 @@ struct ParseDiagnostic {
 
 class ParserDiagnostics {
 public:
-    void note(
-        std::string message
-    );
-
-    void warning(
-        std::string message
-    );
-
-    void error(
-        std::string message
-    );
-
-    void fatal(
-        std::string message
-    );
-
-    void add(
-        ParseDiagnostic diagnostic
-    );
-
+    void note(std::string message);
+    void warning(std::string message);
+    void error(std::string message);
+    void fatal(std::string message);
+    void add(ParseDiagnostic diagnostic);
     void clear();
 
     bool empty() const noexcept;

@@ -29,7 +29,7 @@ CompiledLine IRGenerator::generateLine(std::string_view source, std::size_t line
     result.sourceLine = line;
     result.source = std::string(source);
 
-    std::istringstream stream(std::string(source));
+    std::istringstream stream{std::string(source)};
     std::string word;
     std::size_t column = 1;
     while (stream >> word) {

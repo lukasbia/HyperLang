@@ -1,23 +1,8 @@
-set(HYPER_PARSE_SOURCES
-    Confusables.cpp
-    Lexer.cpp
-    ParseDecl.cpp
-    ParseDeclName.cpp
-    ParseExpr.cpp
-    ParseGeneric.cpp
-    ParseIfConfig.cpp
-    ParsePattern.cpp
-    ParseRegex.cpp
-    ParseRequests.cpp
-    ParseStmt.cpp
-    ParseType.cpp
-    ParseVersion.cpp
-    Parser.cpp
-    PersistentParserState.cpp
-)
-
 add_library(HyperParse STATIC
-    ${HYPER_PARSE_SOURCES}
+    Lexer.cpp
+    LexerToken.cpp
+    Parser.cpp
+    ParserDiagnostics.cpp
 )
 
 target_include_directories(HyperParse
@@ -25,7 +10,4 @@ target_include_directories(HyperParse
         ${PROJECT_SOURCE_DIR}/include
 )
 
-target_compile_features(HyperParse
-    PUBLIC
-        cxx_std_20
-)
+target_compile_features(HyperParse PUBLIC cxx_std_20)
