@@ -42,6 +42,13 @@ public:
 
     LexerState saveState() const noexcept;
     void restoreState(const LexerState& state) noexcept;
+    const Token& peekNextToken() const noexcept;
+    void cutOffLexing() noexcept;
+    bool isCutOff() const noexcept;
+    LexerMode mode() const noexcept;
+    bool isInterfaceMode() const noexcept;
+    bool isHILMode() const noexcept;
+    bool isKeepingComments() const noexcept;
 
 private:
     SourceManager* sources_ = nullptr;
@@ -60,9 +67,15 @@ private:
 
     bool fatal_ = false;
     bool reachedEOF_ = false;
+    bool inDirective_ = false;
+    bool inInterpolation_ = false;
+    SourceOffset lexerCutOffPoint_ = static_cast<SourceOffset>(-1);
+    Token next_{};
 
     char peek(std::size_t lookahead = 0) const noexcept;
     bool atEnd() const noexcept;
+    bool pastCutOff() const noexcept;
+    void flushDiagnostics();
     char consume();
     bool consumeIf(char);
     bool consumeIf(std::string_view);
