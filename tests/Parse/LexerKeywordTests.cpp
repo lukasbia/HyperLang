@@ -1,180 +1,306 @@
 #include "hyper/lib/Parse/Lexer.h"
 #include <iostream>
-#include <string>
 using namespace hyper::parse;
-static int failures=0;
-static void check(bool v,const std::string&n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
+static int failures=0; static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
 int main(){
-  { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_0_function"); check(t.text=="function","spelling_0_function"); check(l.lex().isEOF(),"eof_0_function"); }
-  { Lexer l(" function "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_0"); }
-  { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_1_var"); check(t.text=="var","spelling_1_var"); check(l.lex().isEOF(),"eof_1_var"); }
-  { Lexer l(" var "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_1"); }
-  { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_2_const"); check(t.text=="const","spelling_2_const"); check(l.lex().isEOF(),"eof_2_const"); }
-  { Lexer l(" const "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_2"); }
-  { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_3_struct"); check(t.text=="struct","spelling_3_struct"); check(l.lex().isEOF(),"eof_3_struct"); }
-  { Lexer l(" struct "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_3"); }
-  { Lexer l("class"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_4_class"); check(t.text=="class","spelling_4_class"); check(l.lex().isEOF(),"eof_4_class"); }
-  { Lexer l(" class "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_4"); }
-  { Lexer l("enum"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_5_enum"); check(t.text=="enum","spelling_5_enum"); check(l.lex().isEOF(),"eof_5_enum"); }
-  { Lexer l(" enum "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_5"); }
-  { Lexer l("protocol"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_6_protocol"); check(t.text=="protocol","spelling_6_protocol"); check(l.lex().isEOF(),"eof_6_protocol"); }
-  { Lexer l(" protocol "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_6"); }
-  { Lexer l("extension"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_7_extension"); check(t.text=="extension","spelling_7_extension"); check(l.lex().isEOF(),"eof_7_extension"); }
-  { Lexer l(" extension "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_7"); }
-  { Lexer l("type"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_8_type"); check(t.text=="type","spelling_8_type"); check(l.lex().isEOF(),"eof_8_type"); }
-  { Lexer l(" type "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_8"); }
-  { Lexer l("typealias"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_9_typealias"); check(t.text=="typealias","spelling_9_typealias"); check(l.lex().isEOF(),"eof_9_typealias"); }
-  { Lexer l(" typealias "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_9"); }
-  { Lexer l("template"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_10_template"); check(t.text=="template","spelling_10_template"); check(l.lex().isEOF(),"eof_10_template"); }
-  { Lexer l(" template "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_10"); }
-  { Lexer l("typename"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_11_typename"); check(t.text=="typename","spelling_11_typename"); check(l.lex().isEOF(),"eof_11_typename"); }
-  { Lexer l(" typename "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_11"); }
-  { Lexer l("operator"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_12_operator"); check(t.text=="operator","spelling_12_operator"); check(l.lex().isEOF(),"eof_12_operator"); }
-  { Lexer l(" operator "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_12"); }
-  { Lexer l("namespace"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_13_namespace"); check(t.text=="namespace","spelling_13_namespace"); check(l.lex().isEOF(),"eof_13_namespace"); }
-  { Lexer l(" namespace "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_13"); }
-  { Lexer l("module"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_14_module"); check(t.text=="module","spelling_14_module"); check(l.lex().isEOF(),"eof_14_module"); }
-  { Lexer l(" module "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_14"); }
-  { Lexer l("init"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_15_init"); check(t.text=="init","spelling_15_init"); check(l.lex().isEOF(),"eof_15_init"); }
-  { Lexer l(" init "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_15"); }
-  { Lexer l("deinit"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_16_deinit"); check(t.text=="deinit","spelling_16_deinit"); check(l.lex().isEOF(),"eof_16_deinit"); }
-  { Lexer l(" deinit "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_16"); }
-  { Lexer l("self"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_17_self"); check(t.text=="self","spelling_17_self"); check(l.lex().isEOF(),"eof_17_self"); }
-  { Lexer l(" self "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_17"); }
-  { Lexer l("super"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_18_super"); check(t.text=="super","spelling_18_super"); check(l.lex().isEOF(),"eof_18_super"); }
-  { Lexer l(" super "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_18"); }
-  { Lexer l("new"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_19_new"); check(t.text=="new","spelling_19_new"); check(l.lex().isEOF(),"eof_19_new"); }
-  { Lexer l(" new "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_19"); }
-  { Lexer l("get"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_20_get"); check(t.text=="get","spelling_20_get"); check(l.lex().isEOF(),"eof_20_get"); }
-  { Lexer l(" get "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_20"); }
-  { Lexer l("set"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_21_set"); check(t.text=="set","spelling_21_set"); check(l.lex().isEOF(),"eof_21_set"); }
-  { Lexer l(" set "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_21"); }
-  { Lexer l("if"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_22_if"); check(t.text=="if","spelling_22_if"); check(l.lex().isEOF(),"eof_22_if"); }
-  { Lexer l(" if "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_22"); }
-  { Lexer l("elseif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_23_elseif"); check(t.text=="elseif","spelling_23_elseif"); check(l.lex().isEOF(),"eof_23_elseif"); }
-  { Lexer l(" elseif "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_23"); }
-  { Lexer l("else"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_24_else"); check(t.text=="else","spelling_24_else"); check(l.lex().isEOF(),"eof_24_else"); }
-  { Lexer l(" else "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_24"); }
-  { Lexer l("endif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_25_endif"); check(t.text=="endif","spelling_25_endif"); check(l.lex().isEOF(),"eof_25_endif"); }
-  { Lexer l(" endif "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_25"); }
-  { Lexer l("switch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_26_switch"); check(t.text=="switch","spelling_26_switch"); check(l.lex().isEOF(),"eof_26_switch"); }
-  { Lexer l(" switch "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_26"); }
-  { Lexer l("case"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_27_case"); check(t.text=="case","spelling_27_case"); check(l.lex().isEOF(),"eof_27_case"); }
-  { Lexer l(" case "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_27"); }
-  { Lexer l("default"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_28_default"); check(t.text=="default","spelling_28_default"); check(l.lex().isEOF(),"eof_28_default"); }
-  { Lexer l(" default "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_28"); }
-  { Lexer l("while"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_29_while"); check(t.text=="while","spelling_29_while"); check(l.lex().isEOF(),"eof_29_while"); }
-  { Lexer l(" while "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_29"); }
-  { Lexer l("loop"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_30_loop"); check(t.text=="loop","spelling_30_loop"); check(l.lex().isEOF(),"eof_30_loop"); }
-  { Lexer l(" loop "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_30"); }
-  { Lexer l("do"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_31_do"); check(t.text=="do","spelling_31_do"); check(l.lex().isEOF(),"eof_31_do"); }
-  { Lexer l(" do "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_31"); }
-  { Lexer l("for"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_32_for"); check(t.text=="for","spelling_32_for"); check(l.lex().isEOF(),"eof_32_for"); }
-  { Lexer l(" for "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_32"); }
-  { Lexer l("in"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_33_in"); check(t.text=="in","spelling_33_in"); check(l.lex().isEOF(),"eof_33_in"); }
-  { Lexer l(" in "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_33"); }
-  { Lexer l("break"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_34_break"); check(t.text=="break","spelling_34_break"); check(l.lex().isEOF(),"eof_34_break"); }
-  { Lexer l(" break "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_34"); }
-  { Lexer l("continue"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_35_continue"); check(t.text=="continue","spelling_35_continue"); check(l.lex().isEOF(),"eof_35_continue"); }
-  { Lexer l(" continue "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_35"); }
-  { Lexer l("return"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_36_return"); check(t.text=="return","spelling_36_return"); check(l.lex().isEOF(),"eof_36_return"); }
-  { Lexer l(" return "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_36"); }
-  { Lexer l("throw"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_37_throw"); check(t.text=="throw","spelling_37_throw"); check(l.lex().isEOF(),"eof_37_throw"); }
-  { Lexer l(" throw "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_37"); }
-  { Lexer l("try"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_38_try"); check(t.text=="try","spelling_38_try"); check(l.lex().isEOF(),"eof_38_try"); }
-  { Lexer l(" try "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_38"); }
-  { Lexer l("catch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_39_catch"); check(t.text=="catch","spelling_39_catch"); check(l.lex().isEOF(),"eof_39_catch"); }
-  { Lexer l(" catch "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_39"); }
-  { Lexer l("finally"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_40_finally"); check(t.text=="finally","spelling_40_finally"); check(l.lex().isEOF(),"eof_40_finally"); }
-  { Lexer l(" finally "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_40"); }
-  { Lexer l("defer"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_41_defer"); check(t.text=="defer","spelling_41_defer"); check(l.lex().isEOF(),"eof_41_defer"); }
-  { Lexer l(" defer "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_41"); }
-  { Lexer l("error"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_42_error"); check(t.text=="error","spelling_42_error"); check(l.lex().isEOF(),"eof_42_error"); }
-  { Lexer l(" error "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_42"); }
-  { Lexer l("panic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_43_panic"); check(t.text=="panic","spelling_43_panic"); check(l.lex().isEOF(),"eof_43_panic"); }
-  { Lexer l(" panic "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_43"); }
-  { Lexer l("bool"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_44_bool"); check(t.text=="bool","spelling_44_bool"); check(l.lex().isEOF(),"eof_44_bool"); }
-  { Lexer l(" bool "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_44"); }
-  { Lexer l("int"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_45_int"); check(t.text=="int","spelling_45_int"); check(l.lex().isEOF(),"eof_45_int"); }
-  { Lexer l(" int "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_45"); }
-  { Lexer l("uint"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_46_uint"); check(t.text=="uint","spelling_46_uint"); check(l.lex().isEOF(),"eof_46_uint"); }
-  { Lexer l(" uint "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_46"); }
-  { Lexer l("int8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_47_int8"); check(t.text=="int8","spelling_47_int8"); check(l.lex().isEOF(),"eof_47_int8"); }
-  { Lexer l(" int8 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_47"); }
-  { Lexer l("int16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_48_int16"); check(t.text=="int16","spelling_48_int16"); check(l.lex().isEOF(),"eof_48_int16"); }
-  { Lexer l(" int16 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_48"); }
-  { Lexer l("int32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_49_int32"); check(t.text=="int32","spelling_49_int32"); check(l.lex().isEOF(),"eof_49_int32"); }
-  { Lexer l(" int32 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_49"); }
-  { Lexer l("int64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_50_int64"); check(t.text=="int64","spelling_50_int64"); check(l.lex().isEOF(),"eof_50_int64"); }
-  { Lexer l(" int64 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_50"); }
-  { Lexer l("uint8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_51_uint8"); check(t.text=="uint8","spelling_51_uint8"); check(l.lex().isEOF(),"eof_51_uint8"); }
-  { Lexer l(" uint8 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_51"); }
-  { Lexer l("uint16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_52_uint16"); check(t.text=="uint16","spelling_52_uint16"); check(l.lex().isEOF(),"eof_52_uint16"); }
-  { Lexer l(" uint16 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_52"); }
-  { Lexer l("uint32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_53_uint32"); check(t.text=="uint32","spelling_53_uint32"); check(l.lex().isEOF(),"eof_53_uint32"); }
-  { Lexer l(" uint32 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_53"); }
-  { Lexer l("uint64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_54_uint64"); check(t.text=="uint64","spelling_54_uint64"); check(l.lex().isEOF(),"eof_54_uint64"); }
-  { Lexer l(" uint64 "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_54"); }
-  { Lexer l("float"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_55_float"); check(t.text=="float","spelling_55_float"); check(l.lex().isEOF(),"eof_55_float"); }
-  { Lexer l(" float "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_55"); }
-  { Lexer l("double"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_56_double"); check(t.text=="double","spelling_56_double"); check(l.lex().isEOF(),"eof_56_double"); }
-  { Lexer l(" double "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_56"); }
-  { Lexer l("byte"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_57_byte"); check(t.text=="byte","spelling_57_byte"); check(l.lex().isEOF(),"eof_57_byte"); }
-  { Lexer l(" byte "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_57"); }
-  { Lexer l("char"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_58_char"); check(t.text=="char","spelling_58_char"); check(l.lex().isEOF(),"eof_58_char"); }
-  { Lexer l(" char "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_58"); }
-  { Lexer l("string"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_59_string"); check(t.text=="string","spelling_59_string"); check(l.lex().isEOF(),"eof_59_string"); }
-  { Lexer l(" string "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_59"); }
-  { Lexer l("void"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_60_void"); check(t.text=="void","spelling_60_void"); check(l.lex().isEOF(),"eof_60_void"); }
-  { Lexer l(" void "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_60"); }
-  { Lexer l("nil"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_61_nil"); check(t.text=="nil","spelling_61_nil"); check(l.lex().isEOF(),"eof_61_nil"); }
-  { Lexer l(" nil "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_61"); }
-  { Lexer l("public"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_62_public"); check(t.text=="public","spelling_62_public"); check(l.lex().isEOF(),"eof_62_public"); }
-  { Lexer l(" public "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_62"); }
-  { Lexer l("private"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_63_private"); check(t.text=="private","spelling_63_private"); check(l.lex().isEOF(),"eof_63_private"); }
-  { Lexer l(" private "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_63"); }
-  { Lexer l("protected"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_64_protected"); check(t.text=="protected","spelling_64_protected"); check(l.lex().isEOF(),"eof_64_protected"); }
-  { Lexer l(" protected "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_64"); }
-  { Lexer l("internal"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_65_internal"); check(t.text=="internal","spelling_65_internal"); check(l.lex().isEOF(),"eof_65_internal"); }
-  { Lexer l(" internal "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_65"); }
-  { Lexer l("static"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_66_static"); check(t.text=="static","spelling_66_static"); check(l.lex().isEOF(),"eof_66_static"); }
-  { Lexer l(" static "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_66"); }
-  { Lexer l("extern"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_67_extern"); check(t.text=="extern","spelling_67_extern"); check(l.lex().isEOF(),"eof_67_extern"); }
-  { Lexer l(" extern "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_67"); }
-  { Lexer l("inline"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_68_inline"); check(t.text=="inline","spelling_68_inline"); check(l.lex().isEOF(),"eof_68_inline"); }
-  { Lexer l(" inline "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_68"); }
-  { Lexer l("volatile"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_69_volatile"); check(t.text=="volatile","spelling_69_volatile"); check(l.lex().isEOF(),"eof_69_volatile"); }
-  { Lexer l(" volatile "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_69"); }
-  { Lexer l("sizeof"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_70_sizeof"); check(t.text=="sizeof","spelling_70_sizeof"); check(l.lex().isEOF(),"eof_70_sizeof"); }
-  { Lexer l(" sizeof "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_70"); }
-  { Lexer l("async"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_71_async"); check(t.text=="async","spelling_71_async"); check(l.lex().isEOF(),"eof_71_async"); }
-  { Lexer l(" async "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_71"); }
-  { Lexer l("await"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_72_await"); check(t.text=="await","spelling_72_await"); check(l.lex().isEOF(),"eof_72_await"); }
-  { Lexer l(" await "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_72"); }
-  { Lexer l("task"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_73_task"); check(t.text=="task","spelling_73_task"); check(l.lex().isEOF(),"eof_73_task"); }
-  { Lexer l(" task "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_73"); }
-  { Lexer l("actor"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_74_actor"); check(t.text=="actor","spelling_74_actor"); check(l.lex().isEOF(),"eof_74_actor"); }
-  { Lexer l(" actor "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_74"); }
-  { Lexer l("parallel"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_75_parallel"); check(t.text=="parallel","spelling_75_parallel"); check(l.lex().isEOF(),"eof_75_parallel"); }
-  { Lexer l(" parallel "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_75"); }
-  { Lexer l("atomic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_76_atomic"); check(t.text=="atomic","spelling_76_atomic"); check(l.lex().isEOF(),"eof_76_atomic"); }
-  { Lexer l(" atomic "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_76"); }
-  { Lexer l("input"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_77_input"); check(t.text=="input","spelling_77_input"); check(l.lex().isEOF(),"eof_77_input"); }
-  { Lexer l(" input "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_77"); }
-  { Lexer l("output"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_78_output"); check(t.text=="output","spelling_78_output"); check(l.lex().isEOF(),"eof_78_output"); }
-  { Lexer l(" output "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_78"); }
-  { Lexer l("message"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_79_message"); check(t.text=="message","spelling_79_message"); check(l.lex().isEOF(),"eof_79_message"); }
-  { Lexer l(" message "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_79"); }
-  { Lexer l("show"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_80_show"); check(t.text=="show","spelling_80_show"); check(l.lex().isEOF(),"eof_80_show"); }
-  { Lexer l(" show "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_80"); }
-  { Lexer l("getData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_81_getData"); check(t.text=="getData","spelling_81_getData"); check(l.lex().isEOF(),"eof_81_getData"); }
-  { Lexer l(" getData "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_81"); }
-  { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_82_createData"); check(t.text=="createData","spelling_82_createData"); check(l.lex().isEOF(),"eof_82_createData"); }
-  { Lexer l(" createData "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_82"); }
-  { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_83_from"); check(t.text=="from","spelling_83_from"); check(l.lex().isEOF(),"eof_83_from"); }
-  { Lexer l(" from "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_83"); }
-  { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"keyword_84_import"); check(t.text=="import","spelling_84_import"); check(l.lex().isEOF(),"eof_84_import"); }
-  { Lexer l(" import "); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"space_84"); }
-
-  return failures?1:0;
-}
+ { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_0"); check(t.text=="function","kw_text_0"); }
+ { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_1"); check(t.text=="var","kw_text_1"); }
+ { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_2"); check(t.text=="const","kw_text_2"); }
+ { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_3"); check(t.text=="struct","kw_text_3"); }
+ { Lexer l("class"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_4"); check(t.text=="class","kw_text_4"); }
+ { Lexer l("enum"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_5"); check(t.text=="enum","kw_text_5"); }
+ { Lexer l("protocol"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_6"); check(t.text=="protocol","kw_text_6"); }
+ { Lexer l("extension"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_7"); check(t.text=="extension","kw_text_7"); }
+ { Lexer l("type"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_8"); check(t.text=="type","kw_text_8"); }
+ { Lexer l("typealias"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_9"); check(t.text=="typealias","kw_text_9"); }
+ { Lexer l("template"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_10"); check(t.text=="template","kw_text_10"); }
+ { Lexer l("typename"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_11"); check(t.text=="typename","kw_text_11"); }
+ { Lexer l("operator"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_12"); check(t.text=="operator","kw_text_12"); }
+ { Lexer l("namespace"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_13"); check(t.text=="namespace","kw_text_13"); }
+ { Lexer l("module"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_14"); check(t.text=="module","kw_text_14"); }
+ { Lexer l("init"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_15"); check(t.text=="init","kw_text_15"); }
+ { Lexer l("deinit"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_16"); check(t.text=="deinit","kw_text_16"); }
+ { Lexer l("self"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_17"); check(t.text=="self","kw_text_17"); }
+ { Lexer l("super"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_18"); check(t.text=="super","kw_text_18"); }
+ { Lexer l("new"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_19"); check(t.text=="new","kw_text_19"); }
+ { Lexer l("get"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_20"); check(t.text=="get","kw_text_20"); }
+ { Lexer l("set"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_21"); check(t.text=="set","kw_text_21"); }
+ { Lexer l("if"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_22"); check(t.text=="if","kw_text_22"); }
+ { Lexer l("elseif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_23"); check(t.text=="elseif","kw_text_23"); }
+ { Lexer l("else"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_24"); check(t.text=="else","kw_text_24"); }
+ { Lexer l("endif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_25"); check(t.text=="endif","kw_text_25"); }
+ { Lexer l("switch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_26"); check(t.text=="switch","kw_text_26"); }
+ { Lexer l("case"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_27"); check(t.text=="case","kw_text_27"); }
+ { Lexer l("default"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_28"); check(t.text=="default","kw_text_28"); }
+ { Lexer l("while"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_29"); check(t.text=="while","kw_text_29"); }
+ { Lexer l("loop"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_30"); check(t.text=="loop","kw_text_30"); }
+ { Lexer l("do"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_31"); check(t.text=="do","kw_text_31"); }
+ { Lexer l("for"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_32"); check(t.text=="for","kw_text_32"); }
+ { Lexer l("in"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_33"); check(t.text=="in","kw_text_33"); }
+ { Lexer l("break"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_34"); check(t.text=="break","kw_text_34"); }
+ { Lexer l("continue"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_35"); check(t.text=="continue","kw_text_35"); }
+ { Lexer l("return"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_36"); check(t.text=="return","kw_text_36"); }
+ { Lexer l("throw"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_37"); check(t.text=="throw","kw_text_37"); }
+ { Lexer l("try"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_38"); check(t.text=="try","kw_text_38"); }
+ { Lexer l("catch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_39"); check(t.text=="catch","kw_text_39"); }
+ { Lexer l("finally"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_40"); check(t.text=="finally","kw_text_40"); }
+ { Lexer l("defer"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_41"); check(t.text=="defer","kw_text_41"); }
+ { Lexer l("error"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_42"); check(t.text=="error","kw_text_42"); }
+ { Lexer l("panic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_43"); check(t.text=="panic","kw_text_43"); }
+ { Lexer l("bool"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_44"); check(t.text=="bool","kw_text_44"); }
+ { Lexer l("int"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_45"); check(t.text=="int","kw_text_45"); }
+ { Lexer l("uint"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_46"); check(t.text=="uint","kw_text_46"); }
+ { Lexer l("int8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_47"); check(t.text=="int8","kw_text_47"); }
+ { Lexer l("int16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_48"); check(t.text=="int16","kw_text_48"); }
+ { Lexer l("int32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_49"); check(t.text=="int32","kw_text_49"); }
+ { Lexer l("int64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_50"); check(t.text=="int64","kw_text_50"); }
+ { Lexer l("uint8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_51"); check(t.text=="uint8","kw_text_51"); }
+ { Lexer l("uint16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_52"); check(t.text=="uint16","kw_text_52"); }
+ { Lexer l("uint32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_53"); check(t.text=="uint32","kw_text_53"); }
+ { Lexer l("uint64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_54"); check(t.text=="uint64","kw_text_54"); }
+ { Lexer l("float"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_55"); check(t.text=="float","kw_text_55"); }
+ { Lexer l("double"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_56"); check(t.text=="double","kw_text_56"); }
+ { Lexer l("byte"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_57"); check(t.text=="byte","kw_text_57"); }
+ { Lexer l("char"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_58"); check(t.text=="char","kw_text_58"); }
+ { Lexer l("string"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_59"); check(t.text=="string","kw_text_59"); }
+ { Lexer l("void"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_60"); check(t.text=="void","kw_text_60"); }
+ { Lexer l("nil"); auto t=l.lex(); check(t.kind==TokenKind::NilLiteral,"kw_61"); check(t.text=="nil","kw_text_61"); }
+ { Lexer l("public"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_62"); check(t.text=="public","kw_text_62"); }
+ { Lexer l("private"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_63"); check(t.text=="private","kw_text_63"); }
+ { Lexer l("protected"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_64"); check(t.text=="protected","kw_text_64"); }
+ { Lexer l("internal"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_65"); check(t.text=="internal","kw_text_65"); }
+ { Lexer l("static"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_66"); check(t.text=="static","kw_text_66"); }
+ { Lexer l("extern"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_67"); check(t.text=="extern","kw_text_67"); }
+ { Lexer l("inline"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_68"); check(t.text=="inline","kw_text_68"); }
+ { Lexer l("volatile"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_69"); check(t.text=="volatile","kw_text_69"); }
+ { Lexer l("sizeof"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_70"); check(t.text=="sizeof","kw_text_70"); }
+ { Lexer l("async"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_71"); check(t.text=="async","kw_text_71"); }
+ { Lexer l("await"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_72"); check(t.text=="await","kw_text_72"); }
+ { Lexer l("task"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_73"); check(t.text=="task","kw_text_73"); }
+ { Lexer l("actor"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_74"); check(t.text=="actor","kw_text_74"); }
+ { Lexer l("parallel"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_75"); check(t.text=="parallel","kw_text_75"); }
+ { Lexer l("atomic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_76"); check(t.text=="atomic","kw_text_76"); }
+ { Lexer l("input"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_77"); check(t.text=="input","kw_text_77"); }
+ { Lexer l("output"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_78"); check(t.text=="output","kw_text_78"); }
+ { Lexer l("message"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_79"); check(t.text=="message","kw_text_79"); }
+ { Lexer l("show"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_80"); check(t.text=="show","kw_text_80"); }
+ { Lexer l("getData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_81"); check(t.text=="getData","kw_text_81"); }
+ { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_82"); check(t.text=="createData","kw_text_82"); }
+ { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_83"); check(t.text=="from","kw_text_83"); }
+ { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_84"); check(t.text=="import","kw_text_84"); }
+ { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_85"); check(t.text=="function","kw_text_85"); }
+ { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_86"); check(t.text=="var","kw_text_86"); }
+ { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_87"); check(t.text=="const","kw_text_87"); }
+ { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_88"); check(t.text=="struct","kw_text_88"); }
+ { Lexer l("class"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_89"); check(t.text=="class","kw_text_89"); }
+ { Lexer l("enum"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_90"); check(t.text=="enum","kw_text_90"); }
+ { Lexer l("protocol"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_91"); check(t.text=="protocol","kw_text_91"); }
+ { Lexer l("extension"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_92"); check(t.text=="extension","kw_text_92"); }
+ { Lexer l("type"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_93"); check(t.text=="type","kw_text_93"); }
+ { Lexer l("typealias"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_94"); check(t.text=="typealias","kw_text_94"); }
+ { Lexer l("template"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_95"); check(t.text=="template","kw_text_95"); }
+ { Lexer l("typename"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_96"); check(t.text=="typename","kw_text_96"); }
+ { Lexer l("operator"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_97"); check(t.text=="operator","kw_text_97"); }
+ { Lexer l("namespace"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_98"); check(t.text=="namespace","kw_text_98"); }
+ { Lexer l("module"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_99"); check(t.text=="module","kw_text_99"); }
+ { Lexer l("init"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_100"); check(t.text=="init","kw_text_100"); }
+ { Lexer l("deinit"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_101"); check(t.text=="deinit","kw_text_101"); }
+ { Lexer l("self"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_102"); check(t.text=="self","kw_text_102"); }
+ { Lexer l("super"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_103"); check(t.text=="super","kw_text_103"); }
+ { Lexer l("new"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_104"); check(t.text=="new","kw_text_104"); }
+ { Lexer l("get"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_105"); check(t.text=="get","kw_text_105"); }
+ { Lexer l("set"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_106"); check(t.text=="set","kw_text_106"); }
+ { Lexer l("if"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_107"); check(t.text=="if","kw_text_107"); }
+ { Lexer l("elseif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_108"); check(t.text=="elseif","kw_text_108"); }
+ { Lexer l("else"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_109"); check(t.text=="else","kw_text_109"); }
+ { Lexer l("endif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_110"); check(t.text=="endif","kw_text_110"); }
+ { Lexer l("switch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_111"); check(t.text=="switch","kw_text_111"); }
+ { Lexer l("case"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_112"); check(t.text=="case","kw_text_112"); }
+ { Lexer l("default"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_113"); check(t.text=="default","kw_text_113"); }
+ { Lexer l("while"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_114"); check(t.text=="while","kw_text_114"); }
+ { Lexer l("loop"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_115"); check(t.text=="loop","kw_text_115"); }
+ { Lexer l("do"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_116"); check(t.text=="do","kw_text_116"); }
+ { Lexer l("for"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_117"); check(t.text=="for","kw_text_117"); }
+ { Lexer l("in"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_118"); check(t.text=="in","kw_text_118"); }
+ { Lexer l("break"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_119"); check(t.text=="break","kw_text_119"); }
+ { Lexer l("continue"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_120"); check(t.text=="continue","kw_text_120"); }
+ { Lexer l("return"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_121"); check(t.text=="return","kw_text_121"); }
+ { Lexer l("throw"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_122"); check(t.text=="throw","kw_text_122"); }
+ { Lexer l("try"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_123"); check(t.text=="try","kw_text_123"); }
+ { Lexer l("catch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_124"); check(t.text=="catch","kw_text_124"); }
+ { Lexer l("finally"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_125"); check(t.text=="finally","kw_text_125"); }
+ { Lexer l("defer"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_126"); check(t.text=="defer","kw_text_126"); }
+ { Lexer l("error"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_127"); check(t.text=="error","kw_text_127"); }
+ { Lexer l("panic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_128"); check(t.text=="panic","kw_text_128"); }
+ { Lexer l("bool"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_129"); check(t.text=="bool","kw_text_129"); }
+ { Lexer l("int"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_130"); check(t.text=="int","kw_text_130"); }
+ { Lexer l("uint"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_131"); check(t.text=="uint","kw_text_131"); }
+ { Lexer l("int8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_132"); check(t.text=="int8","kw_text_132"); }
+ { Lexer l("int16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_133"); check(t.text=="int16","kw_text_133"); }
+ { Lexer l("int32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_134"); check(t.text=="int32","kw_text_134"); }
+ { Lexer l("int64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_135"); check(t.text=="int64","kw_text_135"); }
+ { Lexer l("uint8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_136"); check(t.text=="uint8","kw_text_136"); }
+ { Lexer l("uint16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_137"); check(t.text=="uint16","kw_text_137"); }
+ { Lexer l("uint32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_138"); check(t.text=="uint32","kw_text_138"); }
+ { Lexer l("uint64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_139"); check(t.text=="uint64","kw_text_139"); }
+ { Lexer l("float"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_140"); check(t.text=="float","kw_text_140"); }
+ { Lexer l("double"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_141"); check(t.text=="double","kw_text_141"); }
+ { Lexer l("byte"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_142"); check(t.text=="byte","kw_text_142"); }
+ { Lexer l("char"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_143"); check(t.text=="char","kw_text_143"); }
+ { Lexer l("string"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_144"); check(t.text=="string","kw_text_144"); }
+ { Lexer l("void"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_145"); check(t.text=="void","kw_text_145"); }
+ { Lexer l("nil"); auto t=l.lex(); check(t.kind==TokenKind::NilLiteral,"kw_146"); check(t.text=="nil","kw_text_146"); }
+ { Lexer l("public"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_147"); check(t.text=="public","kw_text_147"); }
+ { Lexer l("private"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_148"); check(t.text=="private","kw_text_148"); }
+ { Lexer l("protected"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_149"); check(t.text=="protected","kw_text_149"); }
+ { Lexer l("internal"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_150"); check(t.text=="internal","kw_text_150"); }
+ { Lexer l("static"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_151"); check(t.text=="static","kw_text_151"); }
+ { Lexer l("extern"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_152"); check(t.text=="extern","kw_text_152"); }
+ { Lexer l("inline"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_153"); check(t.text=="inline","kw_text_153"); }
+ { Lexer l("volatile"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_154"); check(t.text=="volatile","kw_text_154"); }
+ { Lexer l("sizeof"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_155"); check(t.text=="sizeof","kw_text_155"); }
+ { Lexer l("async"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_156"); check(t.text=="async","kw_text_156"); }
+ { Lexer l("await"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_157"); check(t.text=="await","kw_text_157"); }
+ { Lexer l("task"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_158"); check(t.text=="task","kw_text_158"); }
+ { Lexer l("actor"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_159"); check(t.text=="actor","kw_text_159"); }
+ { Lexer l("parallel"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_160"); check(t.text=="parallel","kw_text_160"); }
+ { Lexer l("atomic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_161"); check(t.text=="atomic","kw_text_161"); }
+ { Lexer l("input"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_162"); check(t.text=="input","kw_text_162"); }
+ { Lexer l("output"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_163"); check(t.text=="output","kw_text_163"); }
+ { Lexer l("message"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_164"); check(t.text=="message","kw_text_164"); }
+ { Lexer l("show"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_165"); check(t.text=="show","kw_text_165"); }
+ { Lexer l("getData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_166"); check(t.text=="getData","kw_text_166"); }
+ { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_167"); check(t.text=="createData","kw_text_167"); }
+ { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_168"); check(t.text=="from","kw_text_168"); }
+ { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_169"); check(t.text=="import","kw_text_169"); }
+ { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_170"); check(t.text=="function","kw_text_170"); }
+ { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_171"); check(t.text=="var","kw_text_171"); }
+ { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_172"); check(t.text=="const","kw_text_172"); }
+ { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_173"); check(t.text=="struct","kw_text_173"); }
+ { Lexer l("class"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_174"); check(t.text=="class","kw_text_174"); }
+ { Lexer l("enum"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_175"); check(t.text=="enum","kw_text_175"); }
+ { Lexer l("protocol"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_176"); check(t.text=="protocol","kw_text_176"); }
+ { Lexer l("extension"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_177"); check(t.text=="extension","kw_text_177"); }
+ { Lexer l("type"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_178"); check(t.text=="type","kw_text_178"); }
+ { Lexer l("typealias"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_179"); check(t.text=="typealias","kw_text_179"); }
+ { Lexer l("template"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_180"); check(t.text=="template","kw_text_180"); }
+ { Lexer l("typename"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_181"); check(t.text=="typename","kw_text_181"); }
+ { Lexer l("operator"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_182"); check(t.text=="operator","kw_text_182"); }
+ { Lexer l("namespace"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_183"); check(t.text=="namespace","kw_text_183"); }
+ { Lexer l("module"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_184"); check(t.text=="module","kw_text_184"); }
+ { Lexer l("init"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_185"); check(t.text=="init","kw_text_185"); }
+ { Lexer l("deinit"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_186"); check(t.text=="deinit","kw_text_186"); }
+ { Lexer l("self"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_187"); check(t.text=="self","kw_text_187"); }
+ { Lexer l("super"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_188"); check(t.text=="super","kw_text_188"); }
+ { Lexer l("new"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_189"); check(t.text=="new","kw_text_189"); }
+ { Lexer l("get"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_190"); check(t.text=="get","kw_text_190"); }
+ { Lexer l("set"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_191"); check(t.text=="set","kw_text_191"); }
+ { Lexer l("if"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_192"); check(t.text=="if","kw_text_192"); }
+ { Lexer l("elseif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_193"); check(t.text=="elseif","kw_text_193"); }
+ { Lexer l("else"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_194"); check(t.text=="else","kw_text_194"); }
+ { Lexer l("endif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_195"); check(t.text=="endif","kw_text_195"); }
+ { Lexer l("switch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_196"); check(t.text=="switch","kw_text_196"); }
+ { Lexer l("case"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_197"); check(t.text=="case","kw_text_197"); }
+ { Lexer l("default"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_198"); check(t.text=="default","kw_text_198"); }
+ { Lexer l("while"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_199"); check(t.text=="while","kw_text_199"); }
+ { Lexer l("loop"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_200"); check(t.text=="loop","kw_text_200"); }
+ { Lexer l("do"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_201"); check(t.text=="do","kw_text_201"); }
+ { Lexer l("for"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_202"); check(t.text=="for","kw_text_202"); }
+ { Lexer l("in"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_203"); check(t.text=="in","kw_text_203"); }
+ { Lexer l("break"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_204"); check(t.text=="break","kw_text_204"); }
+ { Lexer l("continue"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_205"); check(t.text=="continue","kw_text_205"); }
+ { Lexer l("return"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_206"); check(t.text=="return","kw_text_206"); }
+ { Lexer l("throw"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_207"); check(t.text=="throw","kw_text_207"); }
+ { Lexer l("try"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_208"); check(t.text=="try","kw_text_208"); }
+ { Lexer l("catch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_209"); check(t.text=="catch","kw_text_209"); }
+ { Lexer l("finally"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_210"); check(t.text=="finally","kw_text_210"); }
+ { Lexer l("defer"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_211"); check(t.text=="defer","kw_text_211"); }
+ { Lexer l("error"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_212"); check(t.text=="error","kw_text_212"); }
+ { Lexer l("panic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_213"); check(t.text=="panic","kw_text_213"); }
+ { Lexer l("bool"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_214"); check(t.text=="bool","kw_text_214"); }
+ { Lexer l("int"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_215"); check(t.text=="int","kw_text_215"); }
+ { Lexer l("uint"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_216"); check(t.text=="uint","kw_text_216"); }
+ { Lexer l("int8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_217"); check(t.text=="int8","kw_text_217"); }
+ { Lexer l("int16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_218"); check(t.text=="int16","kw_text_218"); }
+ { Lexer l("int32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_219"); check(t.text=="int32","kw_text_219"); }
+ { Lexer l("int64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_220"); check(t.text=="int64","kw_text_220"); }
+ { Lexer l("uint8"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_221"); check(t.text=="uint8","kw_text_221"); }
+ { Lexer l("uint16"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_222"); check(t.text=="uint16","kw_text_222"); }
+ { Lexer l("uint32"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_223"); check(t.text=="uint32","kw_text_223"); }
+ { Lexer l("uint64"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_224"); check(t.text=="uint64","kw_text_224"); }
+ { Lexer l("float"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_225"); check(t.text=="float","kw_text_225"); }
+ { Lexer l("double"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_226"); check(t.text=="double","kw_text_226"); }
+ { Lexer l("byte"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_227"); check(t.text=="byte","kw_text_227"); }
+ { Lexer l("char"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_228"); check(t.text=="char","kw_text_228"); }
+ { Lexer l("string"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_229"); check(t.text=="string","kw_text_229"); }
+ { Lexer l("void"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_230"); check(t.text=="void","kw_text_230"); }
+ { Lexer l("nil"); auto t=l.lex(); check(t.kind==TokenKind::NilLiteral,"kw_231"); check(t.text=="nil","kw_text_231"); }
+ { Lexer l("public"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_232"); check(t.text=="public","kw_text_232"); }
+ { Lexer l("private"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_233"); check(t.text=="private","kw_text_233"); }
+ { Lexer l("protected"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_234"); check(t.text=="protected","kw_text_234"); }
+ { Lexer l("internal"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_235"); check(t.text=="internal","kw_text_235"); }
+ { Lexer l("static"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_236"); check(t.text=="static","kw_text_236"); }
+ { Lexer l("extern"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_237"); check(t.text=="extern","kw_text_237"); }
+ { Lexer l("inline"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_238"); check(t.text=="inline","kw_text_238"); }
+ { Lexer l("volatile"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_239"); check(t.text=="volatile","kw_text_239"); }
+ { Lexer l("sizeof"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_240"); check(t.text=="sizeof","kw_text_240"); }
+ { Lexer l("async"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_241"); check(t.text=="async","kw_text_241"); }
+ { Lexer l("await"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_242"); check(t.text=="await","kw_text_242"); }
+ { Lexer l("task"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_243"); check(t.text=="task","kw_text_243"); }
+ { Lexer l("actor"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_244"); check(t.text=="actor","kw_text_244"); }
+ { Lexer l("parallel"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_245"); check(t.text=="parallel","kw_text_245"); }
+ { Lexer l("atomic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_246"); check(t.text=="atomic","kw_text_246"); }
+ { Lexer l("input"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_247"); check(t.text=="input","kw_text_247"); }
+ { Lexer l("output"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_248"); check(t.text=="output","kw_text_248"); }
+ { Lexer l("message"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_249"); check(t.text=="message","kw_text_249"); }
+ { Lexer l("show"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_250"); check(t.text=="show","kw_text_250"); }
+ { Lexer l("getData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_251"); check(t.text=="getData","kw_text_251"); }
+ { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_252"); check(t.text=="createData","kw_text_252"); }
+ { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_253"); check(t.text=="from","kw_text_253"); }
+ { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_254"); check(t.text=="import","kw_text_254"); }
+ { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_255"); check(t.text=="function","kw_text_255"); }
+ { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_256"); check(t.text=="var","kw_text_256"); }
+ { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_257"); check(t.text=="const","kw_text_257"); }
+ { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_258"); check(t.text=="struct","kw_text_258"); }
+ { Lexer l("class"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_259"); check(t.text=="class","kw_text_259"); }
+ { Lexer l("enum"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_260"); check(t.text=="enum","kw_text_260"); }
+ { Lexer l("protocol"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_261"); check(t.text=="protocol","kw_text_261"); }
+ { Lexer l("extension"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_262"); check(t.text=="extension","kw_text_262"); }
+ { Lexer l("type"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_263"); check(t.text=="type","kw_text_263"); }
+ { Lexer l("typealias"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_264"); check(t.text=="typealias","kw_text_264"); }
+ { Lexer l("template"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_265"); check(t.text=="template","kw_text_265"); }
+ { Lexer l("typename"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_266"); check(t.text=="typename","kw_text_266"); }
+ { Lexer l("operator"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_267"); check(t.text=="operator","kw_text_267"); }
+ { Lexer l("namespace"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_268"); check(t.text=="namespace","kw_text_268"); }
+ { Lexer l("module"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_269"); check(t.text=="module","kw_text_269"); }
+ { Lexer l("init"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_270"); check(t.text=="init","kw_text_270"); }
+ { Lexer l("deinit"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_271"); check(t.text=="deinit","kw_text_271"); }
+ { Lexer l("self"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_272"); check(t.text=="self","kw_text_272"); }
+ { Lexer l("super"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_273"); check(t.text=="super","kw_text_273"); }
+ { Lexer l("new"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_274"); check(t.text=="new","kw_text_274"); }
+ { Lexer l("get"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_275"); check(t.text=="get","kw_text_275"); }
+ { Lexer l("set"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_276"); check(t.text=="set","kw_text_276"); }
+ { Lexer l("if"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_277"); check(t.text=="if","kw_text_277"); }
+ { Lexer l("elseif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_278"); check(t.text=="elseif","kw_text_278"); }
+ { Lexer l("else"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_279"); check(t.text=="else","kw_text_279"); }
+ { Lexer l("endif"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_280"); check(t.text=="endif","kw_text_280"); }
+ { Lexer l("switch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_281"); check(t.text=="switch","kw_text_281"); }
+ { Lexer l("case"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_282"); check(t.text=="case","kw_text_282"); }
+ { Lexer l("default"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_283"); check(t.text=="default","kw_text_283"); }
+ { Lexer l("while"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_284"); check(t.text=="while","kw_text_284"); }
+ { Lexer l("loop"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_285"); check(t.text=="loop","kw_text_285"); }
+ { Lexer l("do"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_286"); check(t.text=="do","kw_text_286"); }
+ { Lexer l("for"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_287"); check(t.text=="for","kw_text_287"); }
+ { Lexer l("in"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_288"); check(t.text=="in","kw_text_288"); }
+ { Lexer l("break"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_289"); check(t.text=="break","kw_text_289"); }
+ { Lexer l("continue"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_290"); check(t.text=="continue","kw_text_290"); }
+ { Lexer l("return"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_291"); check(t.text=="return","kw_text_291"); }
+ { Lexer l("throw"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_292"); check(t.text=="throw","kw_text_292"); }
+ { Lexer l("try"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_293"); check(t.text=="try","kw_text_293"); }
+ { Lexer l("catch"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_294"); check(t.text=="catch","kw_text_294"); }
+ { Lexer l("finally"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_295"); check(t.text=="finally","kw_text_295"); }
+ { Lexer l("defer"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_296"); check(t.text=="defer","kw_text_296"); }
+ { Lexer l("error"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_297"); check(t.text=="error","kw_text_297"); }
+ { Lexer l("panic"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_298"); check(t.text=="panic","kw_text_298"); }
+ { Lexer l("bool"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_299"); check(t.text=="bool","kw_text_299"); }
+ return failures?1:0; }
