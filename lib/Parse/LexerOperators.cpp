@@ -1,5 +1,6 @@
 #include "hyper/lib/Parse/Lexer.h"
 #include <array>
+#include <cctype>
 namespace hyper::parse {
 Token Lexer::lexOperatorOrPunctuation(){
  const auto start=tokenStart_;
