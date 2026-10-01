@@ -2957,11 +2957,11 @@ void inline Lexer::errorAt(SourceRange range,std::string message){
 
 
 
-LexerState Lexer::saveState() const noexcept {
+inline LexerState Lexer::saveState() const noexcept {
     return LexerState(cursor_, tokenStart_, line_, column_, fatal_, reachedEOF_);
 }
 
-void Lexer::restoreState(const LexerState& state) noexcept {
+inline void Lexer::restoreState(const LexerState& state) noexcept {
     if (!state.isValid())
         return;
     cursor_ = state.cursor_;
@@ -2975,19 +2975,19 @@ void Lexer::restoreState(const LexerState& state) noexcept {
 
 namespace hyper::parse {
 
-bool Lexer::pastCutOff() const noexcept {
+inline bool Lexer::pastCutOff() const noexcept {
     return lexerCutOffPoint_ != static_cast<SourceOffset>(-1) &&
            cursor_ >= lexerCutOffPoint_;
 }
 
-void Lexer::flushDiagnostics() {
+inline void Lexer::flushDiagnostics() {
     if (!diagnosticHandler_)
         return;
     for (const auto &diagnostic : diagnostics_)
         diagnosticHandler_(diagnostic);
 }
 
-const Token &Lexer::peekNextToken() const noexcept {
+inline const Token &Lexer::peekNextToken() const noexcept {
     auto *self = const_cast<Lexer *>(this);
     const LexerState state = self->saveState();
     const std::size_t diagnosticCount = self->diagnostics_.size();
@@ -2998,29 +2998,29 @@ const Token &Lexer::peekNextToken() const noexcept {
     return self->next_;
 }
 
-void Lexer::cutOffLexing() noexcept {
+inline void Lexer::cutOffLexing() noexcept {
     if (lexerCutOffPoint_ == static_cast<SourceOffset>(-1) ||
         lexerCutOffPoint_ > cursor_)
         lexerCutOffPoint_ = cursor_;
 }
 
-bool Lexer::isCutOff() const noexcept {
+inline bool Lexer::isCutOff() const noexcept {
     return lexerCutOffPoint_ != static_cast<SourceOffset>(-1);
 }
 
-LexerMode Lexer::mode() const noexcept {
+inline LexerMode Lexer::mode() const noexcept {
     return options_.mode;
 }
 
-bool Lexer::isInterfaceMode() const noexcept {
+inline bool Lexer::isInterfaceMode() const noexcept {
     return options_.mode == LexerMode::Interface;
 }
 
-bool Lexer::isHILMode() const noexcept {
+inline bool Lexer::isHILMode() const noexcept {
     return options_.mode == LexerMode::HIL;
 }
 
-bool Lexer::isKeepingComments() const noexcept {
+inline bool Lexer::isKeepingComments() const noexcept {
     return options_.preserveComments ||
            options_.commentRetention == CommentRetentionMode::Preserve;
 }
