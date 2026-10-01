@@ -1,169 +1,306 @@
 #include "hyper/lib/Parse/Lexer.h"
 #include <iostream>
 using namespace hyper::parse;
-static int failures=0;
-static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
+static int failures=0; static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
 int main(){
-  { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"operator_0"); check(t.text=="==","operator_text_0"); check(l.lex().isEOF(),"operator_eof_0"); }
-  { Lexer l("x==y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_0"); check(b.kind==TokenKind::EqualEqual,"operator_middle_0"); check(c.kind==TokenKind::Identifier,"operator_right_0"); }
-  { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"operator_1"); check(t.text=="!=","operator_text_1"); check(l.lex().isEOF(),"operator_eof_1"); }
-  { Lexer l("x!=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_1"); check(b.kind==TokenKind::BangEqual,"operator_middle_1"); check(c.kind==TokenKind::Identifier,"operator_right_1"); }
-  { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"operator_2"); check(t.text=="<=","operator_text_2"); check(l.lex().isEOF(),"operator_eof_2"); }
-  { Lexer l("x<=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_2"); check(b.kind==TokenKind::LessEqual,"operator_middle_2"); check(c.kind==TokenKind::Identifier,"operator_right_2"); }
-  { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"operator_3"); check(t.text==">=","operator_text_3"); check(l.lex().isEOF(),"operator_eof_3"); }
-  { Lexer l("x>=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_3"); check(b.kind==TokenKind::GreaterEqual,"operator_middle_3"); check(c.kind==TokenKind::Identifier,"operator_right_3"); }
-  { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"operator_4"); check(t.text=="+=","operator_text_4"); check(l.lex().isEOF(),"operator_eof_4"); }
-  { Lexer l("x+=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_4"); check(b.kind==TokenKind::PlusEqual,"operator_middle_4"); check(c.kind==TokenKind::Identifier,"operator_right_4"); }
-  { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"operator_5"); check(t.text=="-=","operator_text_5"); check(l.lex().isEOF(),"operator_eof_5"); }
-  { Lexer l("x-=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_5"); check(b.kind==TokenKind::MinusEqual,"operator_middle_5"); check(c.kind==TokenKind::Identifier,"operator_right_5"); }
-  { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"operator_6"); check(t.text=="*=","operator_text_6"); check(l.lex().isEOF(),"operator_eof_6"); }
-  { Lexer l("x*=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_6"); check(b.kind==TokenKind::StarEqual,"operator_middle_6"); check(c.kind==TokenKind::Identifier,"operator_right_6"); }
-  { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"operator_7"); check(t.text=="/=","operator_text_7"); check(l.lex().isEOF(),"operator_eof_7"); }
-  { Lexer l("x/=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_7"); check(b.kind==TokenKind::SlashEqual,"operator_middle_7"); check(c.kind==TokenKind::Identifier,"operator_right_7"); }
-  { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"operator_8"); check(t.text=="%=","operator_text_8"); check(l.lex().isEOF(),"operator_eof_8"); }
-  { Lexer l("x%=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_8"); check(b.kind==TokenKind::PercentEqual,"operator_middle_8"); check(c.kind==TokenKind::Identifier,"operator_right_8"); }
-  { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"operator_9"); check(t.text=="&&","operator_text_9"); check(l.lex().isEOF(),"operator_eof_9"); }
-  { Lexer l("x&&y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_9"); check(b.kind==TokenKind::AmpAmp,"operator_middle_9"); check(c.kind==TokenKind::Identifier,"operator_right_9"); }
-  { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"operator_10"); check(t.text=="||","operator_text_10"); check(l.lex().isEOF(),"operator_eof_10"); }
-  { Lexer l("x||y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_10"); check(b.kind==TokenKind::PipePipe,"operator_middle_10"); check(c.kind==TokenKind::Identifier,"operator_right_10"); }
-  { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"operator_11"); check(t.text=="->","operator_text_11"); check(l.lex().isEOF(),"operator_eof_11"); }
-  { Lexer l("x->y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_11"); check(b.kind==TokenKind::Arrow,"operator_middle_11"); check(c.kind==TokenKind::Identifier,"operator_right_11"); }
-  { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"operator_12"); check(t.text=="=>","operator_text_12"); check(l.lex().isEOF(),"operator_eof_12"); }
-  { Lexer l("x=>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_12"); check(b.kind==TokenKind::FatArrow,"operator_middle_12"); check(c.kind==TokenKind::Identifier,"operator_right_12"); }
-  { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"operator_13"); check(t.text=="..","operator_text_13"); check(l.lex().isEOF(),"operator_eof_13"); }
-  { Lexer l("x..y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_13"); check(b.kind==TokenKind::Range,"operator_middle_13"); check(c.kind==TokenKind::Identifier,"operator_right_13"); }
-  { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"operator_14"); check(t.text=="...","operator_text_14"); check(l.lex().isEOF(),"operator_eof_14"); }
-  { Lexer l("x...y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_14"); check(b.kind==TokenKind::Ellipsis,"operator_middle_14"); check(c.kind==TokenKind::Identifier,"operator_right_14"); }
-  { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"operator_15"); check(t.text=="..=","operator_text_15"); check(l.lex().isEOF(),"operator_eof_15"); }
-  { Lexer l("x..=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_15"); check(b.kind==TokenKind::RangeInclusive,"operator_middle_15"); check(c.kind==TokenKind::Identifier,"operator_right_15"); }
-  { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"operator_16"); check(t.text=="??","operator_text_16"); check(l.lex().isEOF(),"operator_eof_16"); }
-  { Lexer l("x??y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_16"); check(b.kind==TokenKind::NullCoalescing,"operator_middle_16"); check(c.kind==TokenKind::Identifier,"operator_right_16"); }
-  { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"operator_17"); check(t.text=="?.","operator_text_17"); check(l.lex().isEOF(),"operator_eof_17"); }
-  { Lexer l("x?.y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_17"); check(b.kind==TokenKind::QuestionDot,"operator_middle_17"); check(c.kind==TokenKind::Identifier,"operator_right_17"); }
-  { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"operator_18"); check(t.text=="!","operator_text_18"); check(l.lex().isEOF(),"operator_eof_18"); }
-  { Lexer l("x!y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_18"); check(b.kind==TokenKind::Bang,"operator_middle_18"); check(c.kind==TokenKind::Identifier,"operator_right_18"); }
-  { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"operator_19"); check(t.text=="=","operator_text_19"); check(l.lex().isEOF(),"operator_eof_19"); }
-  { Lexer l("x=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_19"); check(b.kind==TokenKind::Equal,"operator_middle_19"); check(c.kind==TokenKind::Identifier,"operator_right_19"); }
-  { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"operator_20"); check(t.text=="+","operator_text_20"); check(l.lex().isEOF(),"operator_eof_20"); }
-  { Lexer l("x+y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_20"); check(b.kind==TokenKind::Plus,"operator_middle_20"); check(c.kind==TokenKind::Identifier,"operator_right_20"); }
-  { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"operator_21"); check(t.text=="-","operator_text_21"); check(l.lex().isEOF(),"operator_eof_21"); }
-  { Lexer l("x-y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_21"); check(b.kind==TokenKind::Minus,"operator_middle_21"); check(c.kind==TokenKind::Identifier,"operator_right_21"); }
-  { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"operator_22"); check(t.text=="*","operator_text_22"); check(l.lex().isEOF(),"operator_eof_22"); }
-  { Lexer l("x*y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_22"); check(b.kind==TokenKind::Star,"operator_middle_22"); check(c.kind==TokenKind::Identifier,"operator_right_22"); }
-  { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"operator_23"); check(t.text=="/","operator_text_23"); check(l.lex().isEOF(),"operator_eof_23"); }
-  { Lexer l("x/y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_23"); check(b.kind==TokenKind::Slash,"operator_middle_23"); check(c.kind==TokenKind::Identifier,"operator_right_23"); }
-  { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"operator_24"); check(t.text=="%","operator_text_24"); check(l.lex().isEOF(),"operator_eof_24"); }
-  { Lexer l("x%y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_24"); check(b.kind==TokenKind::Percent,"operator_middle_24"); check(c.kind==TokenKind::Identifier,"operator_right_24"); }
-  { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"operator_25"); check(t.text=="&","operator_text_25"); check(l.lex().isEOF(),"operator_eof_25"); }
-  { Lexer l("x&y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_25"); check(b.kind==TokenKind::Ampersand,"operator_middle_25"); check(c.kind==TokenKind::Identifier,"operator_right_25"); }
-  { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"operator_26"); check(t.text=="|","operator_text_26"); check(l.lex().isEOF(),"operator_eof_26"); }
-  { Lexer l("x|y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_26"); check(b.kind==TokenKind::Pipe,"operator_middle_26"); check(c.kind==TokenKind::Identifier,"operator_right_26"); }
-  { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"operator_27"); check(t.text=="^","operator_text_27"); check(l.lex().isEOF(),"operator_eof_27"); }
-  { Lexer l("x^y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_27"); check(b.kind==TokenKind::Caret,"operator_middle_27"); check(c.kind==TokenKind::Identifier,"operator_right_27"); }
-  { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"operator_28"); check(t.text=="~","operator_text_28"); check(l.lex().isEOF(),"operator_eof_28"); }
-  { Lexer l("x~y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_28"); check(b.kind==TokenKind::Tilde,"operator_middle_28"); check(c.kind==TokenKind::Identifier,"operator_right_28"); }
-  { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"operator_29"); check(t.text=="<","operator_text_29"); check(l.lex().isEOF(),"operator_eof_29"); }
-  { Lexer l("x<y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_29"); check(b.kind==TokenKind::Less,"operator_middle_29"); check(c.kind==TokenKind::Identifier,"operator_right_29"); }
-  { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"operator_30"); check(t.text==">","operator_text_30"); check(l.lex().isEOF(),"operator_eof_30"); }
-  { Lexer l("x>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_30"); check(b.kind==TokenKind::Greater,"operator_middle_30"); check(c.kind==TokenKind::Identifier,"operator_right_30"); }
-  { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"operator_31"); check(t.text=="++","operator_text_31"); check(l.lex().isEOF(),"operator_eof_31"); }
-  { Lexer l("x++y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_31"); check(b.kind==TokenKind::Increment,"operator_middle_31"); check(c.kind==TokenKind::Identifier,"operator_right_31"); }
-  { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"operator_32"); check(t.text=="--","operator_text_32"); check(l.lex().isEOF(),"operator_eof_32"); }
-  { Lexer l("x--y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_32"); check(b.kind==TokenKind::Decrement,"operator_middle_32"); check(c.kind==TokenKind::Identifier,"operator_right_32"); }
-  { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"operator_33"); check(t.text=="<<","operator_text_33"); check(l.lex().isEOF(),"operator_eof_33"); }
-  { Lexer l("x<<y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_33"); check(b.kind==TokenKind::ShiftLeft,"operator_middle_33"); check(c.kind==TokenKind::Identifier,"operator_right_33"); }
-  { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"operator_34"); check(t.text==">>","operator_text_34"); check(l.lex().isEOF(),"operator_eof_34"); }
-  { Lexer l("x>>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_34"); check(b.kind==TokenKind::ShiftRight,"operator_middle_34"); check(c.kind==TokenKind::Identifier,"operator_right_34"); }
-  { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"operator_35"); check(t.text=="<<=","operator_text_35"); check(l.lex().isEOF(),"operator_eof_35"); }
-  { Lexer l("x<<=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_35"); check(b.kind==TokenKind::ShiftLeftEqual,"operator_middle_35"); check(c.kind==TokenKind::Identifier,"operator_right_35"); }
-  { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"operator_36"); check(t.text==">>=","operator_text_36"); check(l.lex().isEOF(),"operator_eof_36"); }
-  { Lexer l("x>>=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_36"); check(b.kind==TokenKind::ShiftRightEqual,"operator_middle_36"); check(c.kind==TokenKind::Identifier,"operator_right_36"); }
-  { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"operator_37"); check(t.text=="+=","operator_text_37"); check(l.lex().isEOF(),"operator_eof_37"); }
-  { Lexer l("x+=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_37"); check(b.kind==TokenKind::PlusEqual,"operator_middle_37"); check(c.kind==TokenKind::Identifier,"operator_right_37"); }
-  { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"operator_38"); check(t.text=="-=","operator_text_38"); check(l.lex().isEOF(),"operator_eof_38"); }
-  { Lexer l("x-=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_38"); check(b.kind==TokenKind::MinusEqual,"operator_middle_38"); check(c.kind==TokenKind::Identifier,"operator_right_38"); }
-  { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"operator_39"); check(t.text=="==","operator_text_39"); check(l.lex().isEOF(),"operator_eof_39"); }
-  { Lexer l("x==y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_39"); check(b.kind==TokenKind::EqualEqual,"operator_middle_39"); check(c.kind==TokenKind::Identifier,"operator_right_39"); }
-  { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"operator_40"); check(t.text=="!=","operator_text_40"); check(l.lex().isEOF(),"operator_eof_40"); }
-  { Lexer l("x!=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_40"); check(b.kind==TokenKind::BangEqual,"operator_middle_40"); check(c.kind==TokenKind::Identifier,"operator_right_40"); }
-  { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"operator_41"); check(t.text=="<=","operator_text_41"); check(l.lex().isEOF(),"operator_eof_41"); }
-  { Lexer l("x<=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_41"); check(b.kind==TokenKind::LessEqual,"operator_middle_41"); check(c.kind==TokenKind::Identifier,"operator_right_41"); }
-  { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"operator_42"); check(t.text==">=","operator_text_42"); check(l.lex().isEOF(),"operator_eof_42"); }
-  { Lexer l("x>=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_42"); check(b.kind==TokenKind::GreaterEqual,"operator_middle_42"); check(c.kind==TokenKind::Identifier,"operator_right_42"); }
-  { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"operator_43"); check(t.text=="+=","operator_text_43"); check(l.lex().isEOF(),"operator_eof_43"); }
-  { Lexer l("x+=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_43"); check(b.kind==TokenKind::PlusEqual,"operator_middle_43"); check(c.kind==TokenKind::Identifier,"operator_right_43"); }
-  { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"operator_44"); check(t.text=="-=","operator_text_44"); check(l.lex().isEOF(),"operator_eof_44"); }
-  { Lexer l("x-=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_44"); check(b.kind==TokenKind::MinusEqual,"operator_middle_44"); check(c.kind==TokenKind::Identifier,"operator_right_44"); }
-  { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"operator_45"); check(t.text=="*=","operator_text_45"); check(l.lex().isEOF(),"operator_eof_45"); }
-  { Lexer l("x*=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_45"); check(b.kind==TokenKind::StarEqual,"operator_middle_45"); check(c.kind==TokenKind::Identifier,"operator_right_45"); }
-  { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"operator_46"); check(t.text=="/=","operator_text_46"); check(l.lex().isEOF(),"operator_eof_46"); }
-  { Lexer l("x/=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_46"); check(b.kind==TokenKind::SlashEqual,"operator_middle_46"); check(c.kind==TokenKind::Identifier,"operator_right_46"); }
-  { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"operator_47"); check(t.text=="%=","operator_text_47"); check(l.lex().isEOF(),"operator_eof_47"); }
-  { Lexer l("x%=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_47"); check(b.kind==TokenKind::PercentEqual,"operator_middle_47"); check(c.kind==TokenKind::Identifier,"operator_right_47"); }
-  { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"operator_48"); check(t.text=="&&","operator_text_48"); check(l.lex().isEOF(),"operator_eof_48"); }
-  { Lexer l("x&&y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_48"); check(b.kind==TokenKind::AmpAmp,"operator_middle_48"); check(c.kind==TokenKind::Identifier,"operator_right_48"); }
-  { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"operator_49"); check(t.text=="||","operator_text_49"); check(l.lex().isEOF(),"operator_eof_49"); }
-  { Lexer l("x||y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_49"); check(b.kind==TokenKind::PipePipe,"operator_middle_49"); check(c.kind==TokenKind::Identifier,"operator_right_49"); }
-  { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"operator_50"); check(t.text=="->","operator_text_50"); check(l.lex().isEOF(),"operator_eof_50"); }
-  { Lexer l("x->y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_50"); check(b.kind==TokenKind::Arrow,"operator_middle_50"); check(c.kind==TokenKind::Identifier,"operator_right_50"); }
-  { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"operator_51"); check(t.text=="=>","operator_text_51"); check(l.lex().isEOF(),"operator_eof_51"); }
-  { Lexer l("x=>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_51"); check(b.kind==TokenKind::FatArrow,"operator_middle_51"); check(c.kind==TokenKind::Identifier,"operator_right_51"); }
-  { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"operator_52"); check(t.text=="..","operator_text_52"); check(l.lex().isEOF(),"operator_eof_52"); }
-  { Lexer l("x..y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_52"); check(b.kind==TokenKind::Range,"operator_middle_52"); check(c.kind==TokenKind::Identifier,"operator_right_52"); }
-  { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"operator_53"); check(t.text=="...","operator_text_53"); check(l.lex().isEOF(),"operator_eof_53"); }
-  { Lexer l("x...y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_53"); check(b.kind==TokenKind::Ellipsis,"operator_middle_53"); check(c.kind==TokenKind::Identifier,"operator_right_53"); }
-  { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"operator_54"); check(t.text=="..=","operator_text_54"); check(l.lex().isEOF(),"operator_eof_54"); }
-  { Lexer l("x..=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_54"); check(b.kind==TokenKind::RangeInclusive,"operator_middle_54"); check(c.kind==TokenKind::Identifier,"operator_right_54"); }
-  { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"operator_55"); check(t.text=="??","operator_text_55"); check(l.lex().isEOF(),"operator_eof_55"); }
-  { Lexer l("x??y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_55"); check(b.kind==TokenKind::NullCoalescing,"operator_middle_55"); check(c.kind==TokenKind::Identifier,"operator_right_55"); }
-  { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"operator_56"); check(t.text=="?.","operator_text_56"); check(l.lex().isEOF(),"operator_eof_56"); }
-  { Lexer l("x?.y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_56"); check(b.kind==TokenKind::QuestionDot,"operator_middle_56"); check(c.kind==TokenKind::Identifier,"operator_right_56"); }
-  { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"operator_57"); check(t.text=="!","operator_text_57"); check(l.lex().isEOF(),"operator_eof_57"); }
-  { Lexer l("x!y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_57"); check(b.kind==TokenKind::Bang,"operator_middle_57"); check(c.kind==TokenKind::Identifier,"operator_right_57"); }
-  { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"operator_58"); check(t.text=="=","operator_text_58"); check(l.lex().isEOF(),"operator_eof_58"); }
-  { Lexer l("x=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_58"); check(b.kind==TokenKind::Equal,"operator_middle_58"); check(c.kind==TokenKind::Identifier,"operator_right_58"); }
-  { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"operator_59"); check(t.text=="+","operator_text_59"); check(l.lex().isEOF(),"operator_eof_59"); }
-  { Lexer l("x+y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_59"); check(b.kind==TokenKind::Plus,"operator_middle_59"); check(c.kind==TokenKind::Identifier,"operator_right_59"); }
-  { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"operator_60"); check(t.text=="-","operator_text_60"); check(l.lex().isEOF(),"operator_eof_60"); }
-  { Lexer l("x-y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_60"); check(b.kind==TokenKind::Minus,"operator_middle_60"); check(c.kind==TokenKind::Identifier,"operator_right_60"); }
-  { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"operator_61"); check(t.text=="*","operator_text_61"); check(l.lex().isEOF(),"operator_eof_61"); }
-  { Lexer l("x*y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_61"); check(b.kind==TokenKind::Star,"operator_middle_61"); check(c.kind==TokenKind::Identifier,"operator_right_61"); }
-  { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"operator_62"); check(t.text=="/","operator_text_62"); check(l.lex().isEOF(),"operator_eof_62"); }
-  { Lexer l("x/y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_62"); check(b.kind==TokenKind::Slash,"operator_middle_62"); check(c.kind==TokenKind::Identifier,"operator_right_62"); }
-  { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"operator_63"); check(t.text=="%","operator_text_63"); check(l.lex().isEOF(),"operator_eof_63"); }
-  { Lexer l("x%y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_63"); check(b.kind==TokenKind::Percent,"operator_middle_63"); check(c.kind==TokenKind::Identifier,"operator_right_63"); }
-  { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"operator_64"); check(t.text=="&","operator_text_64"); check(l.lex().isEOF(),"operator_eof_64"); }
-  { Lexer l("x&y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_64"); check(b.kind==TokenKind::Ampersand,"operator_middle_64"); check(c.kind==TokenKind::Identifier,"operator_right_64"); }
-  { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"operator_65"); check(t.text=="|","operator_text_65"); check(l.lex().isEOF(),"operator_eof_65"); }
-  { Lexer l("x|y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_65"); check(b.kind==TokenKind::Pipe,"operator_middle_65"); check(c.kind==TokenKind::Identifier,"operator_right_65"); }
-  { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"operator_66"); check(t.text=="^","operator_text_66"); check(l.lex().isEOF(),"operator_eof_66"); }
-  { Lexer l("x^y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_66"); check(b.kind==TokenKind::Caret,"operator_middle_66"); check(c.kind==TokenKind::Identifier,"operator_right_66"); }
-  { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"operator_67"); check(t.text=="~","operator_text_67"); check(l.lex().isEOF(),"operator_eof_67"); }
-  { Lexer l("x~y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_67"); check(b.kind==TokenKind::Tilde,"operator_middle_67"); check(c.kind==TokenKind::Identifier,"operator_right_67"); }
-  { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"operator_68"); check(t.text=="<","operator_text_68"); check(l.lex().isEOF(),"operator_eof_68"); }
-  { Lexer l("x<y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_68"); check(b.kind==TokenKind::Less,"operator_middle_68"); check(c.kind==TokenKind::Identifier,"operator_right_68"); }
-  { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"operator_69"); check(t.text==">","operator_text_69"); check(l.lex().isEOF(),"operator_eof_69"); }
-  { Lexer l("x>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_69"); check(b.kind==TokenKind::Greater,"operator_middle_69"); check(c.kind==TokenKind::Identifier,"operator_right_69"); }
-  { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"operator_70"); check(t.text=="++","operator_text_70"); check(l.lex().isEOF(),"operator_eof_70"); }
-  { Lexer l("x++y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_70"); check(b.kind==TokenKind::Increment,"operator_middle_70"); check(c.kind==TokenKind::Identifier,"operator_right_70"); }
-  { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"operator_71"); check(t.text=="--","operator_text_71"); check(l.lex().isEOF(),"operator_eof_71"); }
-  { Lexer l("x--y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_71"); check(b.kind==TokenKind::Decrement,"operator_middle_71"); check(c.kind==TokenKind::Identifier,"operator_right_71"); }
-  { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"operator_72"); check(t.text=="<<","operator_text_72"); check(l.lex().isEOF(),"operator_eof_72"); }
-  { Lexer l("x<<y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_72"); check(b.kind==TokenKind::ShiftLeft,"operator_middle_72"); check(c.kind==TokenKind::Identifier,"operator_right_72"); }
-  { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"operator_73"); check(t.text==">>","operator_text_73"); check(l.lex().isEOF(),"operator_eof_73"); }
-  { Lexer l("x>>y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_73"); check(b.kind==TokenKind::ShiftRight,"operator_middle_73"); check(c.kind==TokenKind::Identifier,"operator_right_73"); }
-  { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"operator_74"); check(t.text=="<<=","operator_text_74"); check(l.lex().isEOF(),"operator_eof_74"); }
-  { Lexer l("x<<=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_74"); check(b.kind==TokenKind::ShiftLeftEqual,"operator_middle_74"); check(c.kind==TokenKind::Identifier,"operator_right_74"); }
-  { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"operator_75"); check(t.text==">>=","operator_text_75"); check(l.lex().isEOF(),"operator_eof_75"); }
-  { Lexer l("x>>=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_75"); check(b.kind==TokenKind::ShiftRightEqual,"operator_middle_75"); check(c.kind==TokenKind::Identifier,"operator_right_75"); }
-  { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"operator_76"); check(t.text=="+=","operator_text_76"); check(l.lex().isEOF(),"operator_eof_76"); }
-  { Lexer l("x+=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_76"); check(b.kind==TokenKind::PlusEqual,"operator_middle_76"); check(c.kind==TokenKind::Identifier,"operator_right_76"); }
-  { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"operator_77"); check(t.text=="-=","operator_text_77"); check(l.lex().isEOF(),"operator_eof_77"); }
-  { Lexer l("x-=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_77"); check(b.kind==TokenKind::MinusEqual,"operator_middle_77"); check(c.kind==TokenKind::Identifier,"operator_right_77"); }
-  { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"operator_78"); check(t.text=="==","operator_text_78"); check(l.lex().isEOF(),"operator_eof_78"); }
-  { Lexer l("x==y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_78"); check(b.kind==TokenKind::EqualEqual,"operator_middle_78"); check(c.kind==TokenKind::Identifier,"operator_right_78"); }
-  { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"operator_79"); check(t.text=="!=","operator_text_79"); check(l.lex().isEOF(),"operator_eof_79"); }
-  { Lexer l("x!=y"); auto a=l.lex(); auto b=l.lex(); auto c=l.lex(); check(a.kind==TokenKind::Identifier,"operator_left_79"); check(b.kind==TokenKind::BangEqual,"operator_middle_79"); check(c.kind==TokenKind::Identifier,"operator_right_79"); }
-
-  return failures?1:0;
-}
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_0"); check(t.text=="==","op_text_0"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_1"); check(t.text=="!=","op_text_1"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_2"); check(t.text=="<=","op_text_2"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_3"); check(t.text==">=","op_text_3"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_4"); check(t.text=="+=","op_text_4"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_5"); check(t.text=="-=","op_text_5"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_6"); check(t.text=="*=","op_text_6"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_7"); check(t.text=="/=","op_text_7"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_8"); check(t.text=="%=","op_text_8"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_9"); check(t.text=="&&","op_text_9"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_10"); check(t.text=="||","op_text_10"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_11"); check(t.text=="->","op_text_11"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_12"); check(t.text=="=>","op_text_12"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_13"); check(t.text=="..","op_text_13"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_14"); check(t.text=="...","op_text_14"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_15"); check(t.text=="..=","op_text_15"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_16"); check(t.text=="??","op_text_16"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_17"); check(t.text=="?.","op_text_17"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_18"); check(t.text=="!","op_text_18"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_19"); check(t.text=="=","op_text_19"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_20"); check(t.text=="+","op_text_20"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_21"); check(t.text=="-","op_text_21"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_22"); check(t.text=="*","op_text_22"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_23"); check(t.text=="/","op_text_23"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_24"); check(t.text=="%","op_text_24"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_25"); check(t.text=="&","op_text_25"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_26"); check(t.text=="|","op_text_26"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_27"); check(t.text=="^","op_text_27"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_28"); check(t.text=="~","op_text_28"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_29"); check(t.text=="<","op_text_29"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_30"); check(t.text==">","op_text_30"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_31"); check(t.text=="++","op_text_31"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_32"); check(t.text=="--","op_text_32"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_33"); check(t.text=="<<","op_text_33"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_34"); check(t.text==">>","op_text_34"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_35"); check(t.text=="<<=","op_text_35"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_36"); check(t.text==">>=","op_text_36"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_37"); check(t.text=="==","op_text_37"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_38"); check(t.text=="!=","op_text_38"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_39"); check(t.text=="<=","op_text_39"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_40"); check(t.text==">=","op_text_40"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_41"); check(t.text=="+=","op_text_41"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_42"); check(t.text=="-=","op_text_42"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_43"); check(t.text=="*=","op_text_43"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_44"); check(t.text=="/=","op_text_44"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_45"); check(t.text=="%=","op_text_45"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_46"); check(t.text=="&&","op_text_46"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_47"); check(t.text=="||","op_text_47"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_48"); check(t.text=="->","op_text_48"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_49"); check(t.text=="=>","op_text_49"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_50"); check(t.text=="..","op_text_50"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_51"); check(t.text=="...","op_text_51"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_52"); check(t.text=="..=","op_text_52"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_53"); check(t.text=="??","op_text_53"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_54"); check(t.text=="?.","op_text_54"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_55"); check(t.text=="!","op_text_55"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_56"); check(t.text=="=","op_text_56"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_57"); check(t.text=="+","op_text_57"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_58"); check(t.text=="-","op_text_58"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_59"); check(t.text=="*","op_text_59"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_60"); check(t.text=="/","op_text_60"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_61"); check(t.text=="%","op_text_61"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_62"); check(t.text=="&","op_text_62"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_63"); check(t.text=="|","op_text_63"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_64"); check(t.text=="^","op_text_64"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_65"); check(t.text=="~","op_text_65"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_66"); check(t.text=="<","op_text_66"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_67"); check(t.text==">","op_text_67"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_68"); check(t.text=="++","op_text_68"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_69"); check(t.text=="--","op_text_69"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_70"); check(t.text=="<<","op_text_70"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_71"); check(t.text==">>","op_text_71"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_72"); check(t.text=="<<=","op_text_72"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_73"); check(t.text==">>=","op_text_73"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_74"); check(t.text=="==","op_text_74"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_75"); check(t.text=="!=","op_text_75"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_76"); check(t.text=="<=","op_text_76"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_77"); check(t.text==">=","op_text_77"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_78"); check(t.text=="+=","op_text_78"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_79"); check(t.text=="-=","op_text_79"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_80"); check(t.text=="*=","op_text_80"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_81"); check(t.text=="/=","op_text_81"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_82"); check(t.text=="%=","op_text_82"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_83"); check(t.text=="&&","op_text_83"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_84"); check(t.text=="||","op_text_84"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_85"); check(t.text=="->","op_text_85"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_86"); check(t.text=="=>","op_text_86"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_87"); check(t.text=="..","op_text_87"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_88"); check(t.text=="...","op_text_88"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_89"); check(t.text=="..=","op_text_89"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_90"); check(t.text=="??","op_text_90"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_91"); check(t.text=="?.","op_text_91"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_92"); check(t.text=="!","op_text_92"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_93"); check(t.text=="=","op_text_93"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_94"); check(t.text=="+","op_text_94"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_95"); check(t.text=="-","op_text_95"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_96"); check(t.text=="*","op_text_96"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_97"); check(t.text=="/","op_text_97"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_98"); check(t.text=="%","op_text_98"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_99"); check(t.text=="&","op_text_99"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_100"); check(t.text=="|","op_text_100"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_101"); check(t.text=="^","op_text_101"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_102"); check(t.text=="~","op_text_102"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_103"); check(t.text=="<","op_text_103"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_104"); check(t.text==">","op_text_104"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_105"); check(t.text=="++","op_text_105"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_106"); check(t.text=="--","op_text_106"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_107"); check(t.text=="<<","op_text_107"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_108"); check(t.text==">>","op_text_108"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_109"); check(t.text=="<<=","op_text_109"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_110"); check(t.text==">>=","op_text_110"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_111"); check(t.text=="==","op_text_111"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_112"); check(t.text=="!=","op_text_112"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_113"); check(t.text=="<=","op_text_113"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_114"); check(t.text==">=","op_text_114"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_115"); check(t.text=="+=","op_text_115"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_116"); check(t.text=="-=","op_text_116"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_117"); check(t.text=="*=","op_text_117"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_118"); check(t.text=="/=","op_text_118"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_119"); check(t.text=="%=","op_text_119"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_120"); check(t.text=="&&","op_text_120"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_121"); check(t.text=="||","op_text_121"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_122"); check(t.text=="->","op_text_122"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_123"); check(t.text=="=>","op_text_123"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_124"); check(t.text=="..","op_text_124"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_125"); check(t.text=="...","op_text_125"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_126"); check(t.text=="..=","op_text_126"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_127"); check(t.text=="??","op_text_127"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_128"); check(t.text=="?.","op_text_128"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_129"); check(t.text=="!","op_text_129"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_130"); check(t.text=="=","op_text_130"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_131"); check(t.text=="+","op_text_131"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_132"); check(t.text=="-","op_text_132"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_133"); check(t.text=="*","op_text_133"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_134"); check(t.text=="/","op_text_134"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_135"); check(t.text=="%","op_text_135"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_136"); check(t.text=="&","op_text_136"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_137"); check(t.text=="|","op_text_137"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_138"); check(t.text=="^","op_text_138"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_139"); check(t.text=="~","op_text_139"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_140"); check(t.text=="<","op_text_140"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_141"); check(t.text==">","op_text_141"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_142"); check(t.text=="++","op_text_142"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_143"); check(t.text=="--","op_text_143"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_144"); check(t.text=="<<","op_text_144"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_145"); check(t.text==">>","op_text_145"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_146"); check(t.text=="<<=","op_text_146"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_147"); check(t.text==">>=","op_text_147"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_148"); check(t.text=="==","op_text_148"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_149"); check(t.text=="!=","op_text_149"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_150"); check(t.text=="<=","op_text_150"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_151"); check(t.text==">=","op_text_151"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_152"); check(t.text=="+=","op_text_152"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_153"); check(t.text=="-=","op_text_153"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_154"); check(t.text=="*=","op_text_154"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_155"); check(t.text=="/=","op_text_155"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_156"); check(t.text=="%=","op_text_156"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_157"); check(t.text=="&&","op_text_157"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_158"); check(t.text=="||","op_text_158"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_159"); check(t.text=="->","op_text_159"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_160"); check(t.text=="=>","op_text_160"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_161"); check(t.text=="..","op_text_161"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_162"); check(t.text=="...","op_text_162"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_163"); check(t.text=="..=","op_text_163"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_164"); check(t.text=="??","op_text_164"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_165"); check(t.text=="?.","op_text_165"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_166"); check(t.text=="!","op_text_166"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_167"); check(t.text=="=","op_text_167"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_168"); check(t.text=="+","op_text_168"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_169"); check(t.text=="-","op_text_169"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_170"); check(t.text=="*","op_text_170"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_171"); check(t.text=="/","op_text_171"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_172"); check(t.text=="%","op_text_172"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_173"); check(t.text=="&","op_text_173"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_174"); check(t.text=="|","op_text_174"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_175"); check(t.text=="^","op_text_175"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_176"); check(t.text=="~","op_text_176"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_177"); check(t.text=="<","op_text_177"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_178"); check(t.text==">","op_text_178"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_179"); check(t.text=="++","op_text_179"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_180"); check(t.text=="--","op_text_180"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_181"); check(t.text=="<<","op_text_181"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_182"); check(t.text==">>","op_text_182"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_183"); check(t.text=="<<=","op_text_183"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_184"); check(t.text==">>=","op_text_184"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_185"); check(t.text=="==","op_text_185"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_186"); check(t.text=="!=","op_text_186"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_187"); check(t.text=="<=","op_text_187"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_188"); check(t.text==">=","op_text_188"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_189"); check(t.text=="+=","op_text_189"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_190"); check(t.text=="-=","op_text_190"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_191"); check(t.text=="*=","op_text_191"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_192"); check(t.text=="/=","op_text_192"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_193"); check(t.text=="%=","op_text_193"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_194"); check(t.text=="&&","op_text_194"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_195"); check(t.text=="||","op_text_195"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_196"); check(t.text=="->","op_text_196"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_197"); check(t.text=="=>","op_text_197"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_198"); check(t.text=="..","op_text_198"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_199"); check(t.text=="...","op_text_199"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_200"); check(t.text=="..=","op_text_200"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_201"); check(t.text=="??","op_text_201"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_202"); check(t.text=="?.","op_text_202"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_203"); check(t.text=="!","op_text_203"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_204"); check(t.text=="=","op_text_204"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_205"); check(t.text=="+","op_text_205"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_206"); check(t.text=="-","op_text_206"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_207"); check(t.text=="*","op_text_207"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_208"); check(t.text=="/","op_text_208"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_209"); check(t.text=="%","op_text_209"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_210"); check(t.text=="&","op_text_210"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_211"); check(t.text=="|","op_text_211"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_212"); check(t.text=="^","op_text_212"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_213"); check(t.text=="~","op_text_213"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_214"); check(t.text=="<","op_text_214"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_215"); check(t.text==">","op_text_215"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_216"); check(t.text=="++","op_text_216"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_217"); check(t.text=="--","op_text_217"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_218"); check(t.text=="<<","op_text_218"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_219"); check(t.text==">>","op_text_219"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_220"); check(t.text=="<<=","op_text_220"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_221"); check(t.text==">>=","op_text_221"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_222"); check(t.text=="==","op_text_222"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_223"); check(t.text=="!=","op_text_223"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_224"); check(t.text=="<=","op_text_224"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_225"); check(t.text==">=","op_text_225"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_226"); check(t.text=="+=","op_text_226"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_227"); check(t.text=="-=","op_text_227"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_228"); check(t.text=="*=","op_text_228"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_229"); check(t.text=="/=","op_text_229"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_230"); check(t.text=="%=","op_text_230"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_231"); check(t.text=="&&","op_text_231"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_232"); check(t.text=="||","op_text_232"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_233"); check(t.text=="->","op_text_233"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_234"); check(t.text=="=>","op_text_234"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_235"); check(t.text=="..","op_text_235"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_236"); check(t.text=="...","op_text_236"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_237"); check(t.text=="..=","op_text_237"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_238"); check(t.text=="??","op_text_238"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_239"); check(t.text=="?.","op_text_239"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_240"); check(t.text=="!","op_text_240"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_241"); check(t.text=="=","op_text_241"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_242"); check(t.text=="+","op_text_242"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_243"); check(t.text=="-","op_text_243"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_244"); check(t.text=="*","op_text_244"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_245"); check(t.text=="/","op_text_245"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_246"); check(t.text=="%","op_text_246"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_247"); check(t.text=="&","op_text_247"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_248"); check(t.text=="|","op_text_248"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_249"); check(t.text=="^","op_text_249"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_250"); check(t.text=="~","op_text_250"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_251"); check(t.text=="<","op_text_251"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_252"); check(t.text==">","op_text_252"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_253"); check(t.text=="++","op_text_253"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_254"); check(t.text=="--","op_text_254"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_255"); check(t.text=="<<","op_text_255"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_256"); check(t.text==">>","op_text_256"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_257"); check(t.text=="<<=","op_text_257"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_258"); check(t.text==">>=","op_text_258"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_259"); check(t.text=="==","op_text_259"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_260"); check(t.text=="!=","op_text_260"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_261"); check(t.text=="<=","op_text_261"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_262"); check(t.text==">=","op_text_262"); }
+ { Lexer l("+="); auto t=l.lex(); check(t.kind==TokenKind::PlusEqual,"op_263"); check(t.text=="+=","op_text_263"); }
+ { Lexer l("-="); auto t=l.lex(); check(t.kind==TokenKind::MinusEqual,"op_264"); check(t.text=="-=","op_text_264"); }
+ { Lexer l("*="); auto t=l.lex(); check(t.kind==TokenKind::StarEqual,"op_265"); check(t.text=="*=","op_text_265"); }
+ { Lexer l("/="); auto t=l.lex(); check(t.kind==TokenKind::SlashEqual,"op_266"); check(t.text=="/=","op_text_266"); }
+ { Lexer l("%="); auto t=l.lex(); check(t.kind==TokenKind::PercentEqual,"op_267"); check(t.text=="%=","op_text_267"); }
+ { Lexer l("&&"); auto t=l.lex(); check(t.kind==TokenKind::AmpAmp,"op_268"); check(t.text=="&&","op_text_268"); }
+ { Lexer l("||"); auto t=l.lex(); check(t.kind==TokenKind::PipePipe,"op_269"); check(t.text=="||","op_text_269"); }
+ { Lexer l("->"); auto t=l.lex(); check(t.kind==TokenKind::Arrow,"op_270"); check(t.text=="->","op_text_270"); }
+ { Lexer l("=>"); auto t=l.lex(); check(t.kind==TokenKind::FatArrow,"op_271"); check(t.text=="=>","op_text_271"); }
+ { Lexer l(".."); auto t=l.lex(); check(t.kind==TokenKind::Range,"op_272"); check(t.text=="..","op_text_272"); }
+ { Lexer l("..."); auto t=l.lex(); check(t.kind==TokenKind::Ellipsis,"op_273"); check(t.text=="...","op_text_273"); }
+ { Lexer l("..="); auto t=l.lex(); check(t.kind==TokenKind::RangeInclusive,"op_274"); check(t.text=="..=","op_text_274"); }
+ { Lexer l("??"); auto t=l.lex(); check(t.kind==TokenKind::NullCoalescing,"op_275"); check(t.text=="??","op_text_275"); }
+ { Lexer l("?."); auto t=l.lex(); check(t.kind==TokenKind::QuestionDot,"op_276"); check(t.text=="?.","op_text_276"); }
+ { Lexer l("!"); auto t=l.lex(); check(t.kind==TokenKind::Bang,"op_277"); check(t.text=="!","op_text_277"); }
+ { Lexer l("="); auto t=l.lex(); check(t.kind==TokenKind::Equal,"op_278"); check(t.text=="=","op_text_278"); }
+ { Lexer l("+"); auto t=l.lex(); check(t.kind==TokenKind::Plus,"op_279"); check(t.text=="+","op_text_279"); }
+ { Lexer l("-"); auto t=l.lex(); check(t.kind==TokenKind::Minus,"op_280"); check(t.text=="-","op_text_280"); }
+ { Lexer l("*"); auto t=l.lex(); check(t.kind==TokenKind::Star,"op_281"); check(t.text=="*","op_text_281"); }
+ { Lexer l("/"); auto t=l.lex(); check(t.kind==TokenKind::Slash,"op_282"); check(t.text=="/","op_text_282"); }
+ { Lexer l("%"); auto t=l.lex(); check(t.kind==TokenKind::Percent,"op_283"); check(t.text=="%","op_text_283"); }
+ { Lexer l("&"); auto t=l.lex(); check(t.kind==TokenKind::Ampersand,"op_284"); check(t.text=="&","op_text_284"); }
+ { Lexer l("|"); auto t=l.lex(); check(t.kind==TokenKind::Pipe,"op_285"); check(t.text=="|","op_text_285"); }
+ { Lexer l("^"); auto t=l.lex(); check(t.kind==TokenKind::Caret,"op_286"); check(t.text=="^","op_text_286"); }
+ { Lexer l("~"); auto t=l.lex(); check(t.kind==TokenKind::Tilde,"op_287"); check(t.text=="~","op_text_287"); }
+ { Lexer l("<"); auto t=l.lex(); check(t.kind==TokenKind::Less,"op_288"); check(t.text=="<","op_text_288"); }
+ { Lexer l(">"); auto t=l.lex(); check(t.kind==TokenKind::Greater,"op_289"); check(t.text==">","op_text_289"); }
+ { Lexer l("++"); auto t=l.lex(); check(t.kind==TokenKind::Increment,"op_290"); check(t.text=="++","op_text_290"); }
+ { Lexer l("--"); auto t=l.lex(); check(t.kind==TokenKind::Decrement,"op_291"); check(t.text=="--","op_text_291"); }
+ { Lexer l("<<"); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeft,"op_292"); check(t.text=="<<","op_text_292"); }
+ { Lexer l(">>"); auto t=l.lex(); check(t.kind==TokenKind::ShiftRight,"op_293"); check(t.text==">>","op_text_293"); }
+ { Lexer l("<<="); auto t=l.lex(); check(t.kind==TokenKind::ShiftLeftEqual,"op_294"); check(t.text=="<<=","op_text_294"); }
+ { Lexer l(">>="); auto t=l.lex(); check(t.kind==TokenKind::ShiftRightEqual,"op_295"); check(t.text==">>=","op_text_295"); }
+ { Lexer l("=="); auto t=l.lex(); check(t.kind==TokenKind::EqualEqual,"op_296"); check(t.text=="==","op_text_296"); }
+ { Lexer l("!="); auto t=l.lex(); check(t.kind==TokenKind::BangEqual,"op_297"); check(t.text=="!=","op_text_297"); }
+ { Lexer l("<="); auto t=l.lex(); check(t.kind==TokenKind::LessEqual,"op_298"); check(t.text=="<=","op_text_298"); }
+ { Lexer l(">="); auto t=l.lex(); check(t.kind==TokenKind::GreaterEqual,"op_299"); check(t.text==">=","op_text_299"); }
+ return failures?1:0; }
