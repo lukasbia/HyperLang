@@ -175,3 +175,157 @@ bool Lexer::consumeNumericSeparator(){return options_.allowNumericSeparators&&co
 TokenKind Lexer::lookupKeyword(std::string_view s)const noexcept{for(auto&e:keywordTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
 TokenKind Lexer::lookupSpecialKeyword(std::string_view s)const noexcept{for(auto&e:specialTable)if(e.spelling==s)return e.kind;return TokenKind::Identifier;}
 }
+
+
+// ===== Merged from lib/Parse/LexerLiterals.cpp =====
+
+namespace hyper::parse {
+namespace {
+bool isNameByte(unsigned char c){return std::isalnum(c)||c=='_'||c>=0x80;}
+int hexValue(char c){if(c>='0'&&c<='9')return c-'0';if(c>='a'&&c<='f')return c-'a'+10;if(c>='A'&&c<='F')return c-'A'+10;return -1;}
+}
+Token Lexer::lexIdentifierOrKeyword(){
+ const auto start=tokenStart_;
+ while(!atEnd()){
+  unsigned char c=static_cast<unsigned char>(peek());
+  if(c<0x80){if(!isNameByte(c))break;consume();continue;}
+  std::size_t width=0;auto cp=decodeUTF8(cursor_,width);if(cp==0||width==0)break;
+  cursor_+=width;column_+=static_cast<SourceColumn>(width);
+ }
+ std::string_view spelling=input_.substr(start,cursor_-start);
+ TokenKind kind=lookupKeyword(spelling);
+ if(kind==TokenKind::Identifier && options_.allowUnicodeIdentifiers && spelling.find_first_of("@")!=std::string_view::npos)
+  kind=lookupSpecialKeyword(spelling);
+ return makeToken(kind,start);
+}
+Token Lexer::lexNumber(){
+ const auto start=tokenStart_;
+ bool floating=false;
+ if(peek()=='.'){floating=true;consume();consumeDigits(10);}
+ else{
+  if(peek()=='0'){
+   if(peek(1)=='x'||peek(1)=='X'){consume();consume();consumeDigits(16);return makeToken(TokenKind::IntegerLiteral,start);}
+   if(peek(1)=='b'||peek(1)=='B'){consume();consume();consumeDigits(2);return makeToken(TokenKind::IntegerLiteral,start);}
+   if(peek(1)=='o'||peek(1)=='O'){consume();consume();consumeDigits(8);return makeToken(TokenKind::IntegerLiteral,start);}
+  }
+  consumeDigits(10);
+  if(peek()=='.'&&peek(1)!='.'){floating=true;consume();consumeDigits(10);}
+ }
+ if((peek()=='e'||peek()=='E')&&options_.allowScientificNotation){
+  floating=true;consume();if(peek()=='+'||peek()=='-')consume();if(!isDecimalDigit(peek()))error("expected exponent digits");consumeDigits(10);
+ }
+ if(std::isalpha(static_cast<unsigned char>(peek()))||peek()=='_')error("invalid character in numeric literal");
+ return makeToken(floating?TokenKind::FloatingLiteral:TokenKind::IntegerLiteral,start);
+}
+bool Lexer::lexHexEscape(std::string&out,std::size_t count){
+ std::uint32_t value=0;
+ for(std::size_t i=0;i<count;++i){int v=hexValue(peek());if(v<0){error("invalid hexadecimal escape");return false;}value=(value<<4)|static_cast<std::uint32_t>(v);consume();}
+ out.push_back(static_cast<char>(value&0xff));return true;
+}
+bool Lexer::lexUnicodeEscape(std::string&out,std::size_t count){
+ if(!consumeIf('{')){error("expected '{' in unicode escape");return false;}
+ std::uint32_t value=0;std::size_t digits=0;
+ while(!atEnd()&&peek()!='}'){int v=hexValue(peek());if(v<0||digits>=count){error("invalid unicode escape");return false;}value=(value<<4)|static_cast<std::uint32_t>(v);++digits;consume();}
+ if(!consumeIf('}')||digits==0||value>0x10ffff){error("invalid unicode scalar escape");return false;}
+ if(value<=0x7f)out.push_back(static_cast<char>(value));
+ else if(value<=0x7ff){out.push_back(static_cast<char>(0xc0|(value>>6)));out.push_back(static_cast<char>(0x80|(value&0x3f)));}
+ else if(value<=0xffff){out.push_back(static_cast<char>(0xe0|(value>>12)));out.push_back(static_cast<char>(0x80|((value>>6)&0x3f)));out.push_back(static_cast<char>(0x80|(value&0x3f)));}
+ else{out.push_back(static_cast<char>(0xf0|(value>>18)));out.push_back(static_cast<char>(0x80|((value>>12)&0x3f)));out.push_back(static_cast<char>(0x80|((value>>6)&0x3f)));out.push_back(static_cast<char>(0x80|(value&0x3f)));}
+ return true;
+}
+bool Lexer::lexEscape(std::string&out){
+ if(atEnd())return false;char c=consume();
+ switch(c){
+  case 'n':out+='\n';return true; case 'r':out+='\r';return true; case 't':out+='\t';return true;
+  case 'b':out+='\b';return true; case 'f':out+='\f';return true; case 'v':out+='\v';return true;
+  case '0':out+='\0';return true; case '\\':out+='\\';return true; case '"':out+='"';return true; case '\'':out+='\'';return true;
+  case 'x':return lexHexEscape(out,2); case 'u':return lexUnicodeEscape(out,6);
+  case '\n':return true;
+  default:error("unknown escape sequence");out.push_back(c);return false;
+ }
+}
+Token Lexer::lexString(){
+ const auto start=tokenStart_;consume();std::string value;
+ while(!atEnd()){
+  if(peek()=='"'){consume();return makeToken(TokenKind::StringLiteral,start);}
+  if(peek()=='\\'){consume();lexEscape(value);continue;}
+  if(peek()=='\n'||peek()=='\r'){error("unterminated string literal");break;}
+  value.push_back(consume());
+ }
+ error("unterminated string literal");return makeToken(TokenKind::Unknown,start);
+}
+Token Lexer::lexCharacter(){
+ const auto start=tokenStart_;consume();std::string value;
+ if(atEnd()||peek()=='\n'){error("unterminated character literal");return makeToken(TokenKind::Unknown,start);}
+ if(peek()=='\\'){consume();lexEscape(value);}else value.push_back(consume());
+ if(!consumeIf('\'')){error("character literal must contain one character");while(!atEnd()&&peek()!='\n'&&peek()!='\'')consume();}
+ return makeToken(TokenKind::CharacterLiteral,start);
+}
+}
+
+
+// ===== Merged from lib/Parse/LexerOperators.cpp =====
+
+namespace hyper::parse {
+Token Lexer::lexOperatorOrPunctuation(){
+ const auto start=tokenStart_;
+ const auto two=[&](std::string_view s,TokenKind k){if(input_.substr(cursor_,s.size())==s){for(char c:s)consume();return makeToken(k,start);}return Token{};};
+ switch(peek()){
+  case '(':consume();return makeSimple(TokenKind::LParen); case ')':consume();return makeSimple(TokenKind::RParen);
+  case '{':consume();return makeSimple(TokenKind::LBrace); case '}':consume();return makeSimple(TokenKind::RBrace);
+  case '[':consume();return makeSimple(TokenKind::LBracket); case ']':consume();return makeSimple(TokenKind::RBracket);
+  case ',':consume();return makeSimple(TokenKind::Comma); case ':': if(peek(1)==':'){consume();consume();return makeSimple(TokenKind::DoubleColon);} consume();return makeSimple(TokenKind::Colon);
+  case ';':consume();return makeSimple(TokenKind::Semicolon);
+  case '?': if(peek(1)=='.'){consume();consume();return makeSimple(TokenKind::QuestionDot);} if(peek(1)=='?'){consume();consume();return makeSimple(TokenKind::NullCoalescing);} consume();return makeSimple(TokenKind::Question);
+  case '.': if(peek(1)=='.'&&peek(2)=='.'){consume();consume();consume();return makeSimple(TokenKind::Ellipsis);} if(peek(1)=='.'&&peek(2)=='='){consume();consume();consume();return makeSimple(TokenKind::RangeInclusive);} if(peek(1)=='.'){consume();consume();return makeSimple(TokenKind::Range);} consume();return makeSimple(TokenKind::Dot);
+  case '+': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::PlusEqual);} if(peek(1)=='+'){consume();consume();return makeSimple(TokenKind::Increment);} consume();return makeSimple(TokenKind::Plus);
+  case '-': if(peek(1)=='>'){consume();consume();return makeSimple(TokenKind::Arrow);} if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::MinusEqual);} if(peek(1)=='-'){consume();consume();return makeSimple(TokenKind::Decrement);} consume();return makeSimple(TokenKind::Minus);
+  case '*': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::StarEqual);} consume();return makeSimple(TokenKind::Star);
+  case '/': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::SlashEqual);} consume();return makeSimple(TokenKind::Slash);
+  case '%': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::PercentEqual);} consume();return makeSimple(TokenKind::Percent);
+  case '&': if(peek(1)=='&'){consume();consume();return makeSimple(TokenKind::AmpAmp);} if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::AmpEqual);} consume();return makeSimple(TokenKind::Ampersand);
+  case '|': if(peek(1)=='|'){consume();consume();return makeSimple(TokenKind::PipePipe);} if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::PipeEqual);} if(peek(1)=='>'){consume();consume();return makeSimple(TokenKind::FatArrow);} consume();return makeSimple(TokenKind::Pipe);
+  case '^': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::CaretEqual);} consume();return makeSimple(TokenKind::Caret);
+  case '~':consume();return makeSimple(TokenKind::Tilde);
+  case '!': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::BangEqual);} if(peek(1)=='.'){consume();consume();return makeSimple(TokenKind::BangDot);} consume();return makeSimple(TokenKind::Bang);
+  case '=': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::EqualEqual);} if(peek(1)=='>'){consume();consume();return makeSimple(TokenKind::FatArrow);} consume();return makeSimple(TokenKind::Equal);
+  case '<': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::LessEqual);} if(peek(1)=='<'){consume();consume();if(peek()=='='){consume();return makeSimple(TokenKind::ShiftLeftEqual);}return makeSimple(TokenKind::ShiftLeft);} consume();return makeSimple(TokenKind::Less);
+  case '>': if(peek(1)=='='){consume();consume();return makeSimple(TokenKind::GreaterEqual);} if(peek(1)=='>'){consume();consume();if(peek()=='='){consume();return makeSimple(TokenKind::ShiftRightEqual);}return makeSimple(TokenKind::ShiftRight);} consume();return makeSimple(TokenKind::Greater);
+  case '@': {
+    while(peek()=='@'||std::isalpha(static_cast<unsigned char>(peek()))||std::isdigit(static_cast<unsigned char>(peek()))||peek()=='_')consume();
+    auto spelling=input_.substr(start,cursor_-start);auto k=lookupSpecialKeyword(spelling);
+    if(k!=TokenKind::Identifier)return makeToken(k,start);
+    error("unknown @-keyword");return makeToken(TokenKind::Unknown,start);
+  }
+  default: consume();error("unexpected character");return makeToken(TokenKind::Unknown,start);
+ }
+}
+}
+
+
+// ===== Merged from lib/Parse/LexerUnicode.cpp =====
+
+namespace hyper::parse {
+std::uint32_t Lexer::decodeUTF8(SourceOffset off,std::size_t&width)const noexcept{
+ width=0;if(off>=input_.size())return 0;const auto p=[&](std::size_t i){return static_cast<unsigned char>(off+i<input_.size()?input_[off+i]:0);};
+ unsigned char b=p(0);
+ if(b<0x80){width=1;return b;}
+ if((b&0xe0)==0xc0){if((p(1)&0xc0)!=0x80)return 0;width=2;return ((b&0x1f)<<6)|(p(1)&0x3f);}
+ if((b&0xf0)==0xe0){if((p(1)&0xc0)!=0x80||(p(2)&0xc0)!=0x80)return 0;width=3;auto cp=((b&0xf)<<12)|((p(1)&0x3f)<<6)|(p(2)&0x3f);return cp<0x800?0:cp;}
+ if((b&0xf8)==0xf0){if((p(1)&0xc0)!=0x80||(p(2)&0xc0)!=0x80||(p(3)&0xc0)!=0x80)return 0;width=4;auto cp=((b&7)<<18)|((p(1)&0x3f)<<12)|((p(2)&0x3f)<<6)|(p(3)&0x3f);return cp<0x10000||cp>0x10ffff?0:cp;}
+ return 0;
+}
+bool Lexer::lexUTF8Identifier(){
+ std::size_t width=0;auto cp=decodeUTF8(cursor_,width);if(cp==0||width==0)return false;cursor_+=width;column_+=static_cast<SourceColumn>(width);return true;
+}
+}
+
+
+// ===== Merged from lib/Parse/LexerDiagnostics.cpp =====
+
+namespace hyper::parse {
+void Lexer::error(std::string message){errorAt(makeToken(TokenKind::Unknown,tokenStart_).range,std::move(message));}
+void Lexer::errorAt(SourceRange range,std::string message){
+ LexerDiagnostic d{DiagnosticSeverity::Error,range,std::move(message)};diagnostics_.push_back(d);if(diagnosticHandler_)diagnosticHandler_(diagnostics_.back());
+}
+}
