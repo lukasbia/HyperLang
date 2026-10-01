@@ -48,5 +48,4 @@ struct Token {
  bool isTrivia() const noexcept; bool isKeyword() const noexcept; bool isPunctuation() const noexcept;
 };
 const char* tokenKindName(TokenKind) noexcept;
-TokenKind operatorKind(std::string_view text);
 } // namespace hyper
