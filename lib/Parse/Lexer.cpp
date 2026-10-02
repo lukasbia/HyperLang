@@ -632,7 +632,7 @@ Token Lexer::lexCharacter() {
 bool Lexer::skipLineComment() {
   if (currentByte() == '/' && peekByte() == '/') {
     advanceBytes(2);
-    while (!atEnd() && currentByte() != '\n')
+    while (!atEnd() && currentByte() != '\n' && currentByte() != '\r')
       advanceByte();
     return true;
   }
