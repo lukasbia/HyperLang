@@ -1,6 +1,6 @@
 #ifndef HYPERLANG_DRIVER_COMPILATION_H
 #define HYPERLANG_DRIVER_COMPILATION_H
-#include "hyperlang/Driver/Job.h"
+#include "Job.h"
 #include <utility>
 #include <vector>
 namespace hyperlang::driver {
