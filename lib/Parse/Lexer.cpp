@@ -70,7 +70,7 @@ void Lexer::advanceBytes(std::size_t count) {
   const std::size_t remaining = source_.size() - cursor_;
   count = std::min(count, remaining);
   while (count != 0 && static_cast<unsigned char>(source_[cursor_]) < 0x80u) {
-    if (source_[cursor_] == '\\n') {
+    if (source_[cursor_] == '\n') {
       ++line_;
       column_ = 1;
     } else {
@@ -191,6 +191,11 @@ bool Lexer::isKeyword(std::string_view identifier) {
 bool Lexer::isAttribute(std::string_view spelling) {
   return lexer::isAttributeSpelling(spelling);
 }
+
+bool Lexer::isOperatorCharacter(char ch) {
+  return lexer::isOperatorCharacter(ch);
+}
+
 Token Lexer::lexIdentifierOrKeyword() {
   const std::size_t start = cursor_;
   const SourceLocation loc = currentLocation();
@@ -198,7 +203,7 @@ Token Lexer::lexIdentifierOrKeyword() {
 
   const std::string_view spelling = source_.substr(start, cursor_ - start);
   Token token = makeToken(classifyIdentifier(spelling), start, loc);
-  token.decodedText = std::string(spelling);
+  token.decodedText = decodeIdentifier(spelling);
   return token;
 }
 
@@ -235,8 +240,12 @@ Token Lexer::lexAttributedName() {
   const SourceLocation loc = currentLocation();
 
   advanceByte();
+  const std::size_t nameStart = cursor_;
   while (isAsciiIdentifierContinue(currentByte()))
     advanceByte();
+
+  if (cursor_ == nameStart)
+    return makeToken(tok::Kind::At, start, loc);
 
   const std::string_view spelling = source_.substr(start, cursor_ - start);
   for (const lexer::AttributeEntry &entry : lexer::AttributeTable)
@@ -275,6 +284,7 @@ void Lexer::finalizeInteger(Token &token, unsigned base) {
 void Lexer::finalizeFloat(Token &token) {
   std::string normalized;
   normalized.reserve(token.text.size());
+
   for (char ch : token.text)
     if (ch != '_')
       normalized.push_back(ch);
@@ -283,16 +293,36 @@ void Lexer::finalizeFloat(Token &token) {
       (normalized.back() == 'f' || normalized.back() == 'F'))
     normalized.pop_back();
 
-  errno = 0;
-  char *end = nullptr;
-  const double value = std::strtod(normalized.c_str(), &end);
+  const bool hexadecimal =
+      normalized.size() >= 2 &&
+      normalized[0] == '0' &&
+      (normalized[1] == 'x' || normalized[1] == 'X');
 
-  if (end != normalized.c_str() && errno != ERANGE) {
+  const char *first = normalized.data();
+  const char *last = normalized.data() + normalized.size();
+  if (hexadecimal) {
+    first += 2;
+    if (first == last) {
+      error(token.range.start, "invalid hexadecimal floating-point literal");
+      return;
+    }
+  }
+
+  double value = 0.0;
+  const auto parsed = std::from_chars(
+      first, last, value,
+      hexadecimal ? std::chars_format::hex : std::chars_format::general);
+
+  if (parsed.ec == std::errc{} && parsed.ptr == last) {
     token.floatingValue = value;
     token.hasFloatingValue = true;
-  } else {
-    error(token.range.start, "invalid floating-point literal");
+    return;
   }
+
+  if (parsed.ec == std::errc::result_out_of_range)
+    error(token.range.start, "floating-point literal is outside the supported range");
+  else
+    error(token.range.start, "invalid floating-point literal");
 }
 
 Token Lexer::lexNumber() {
@@ -300,36 +330,52 @@ Token Lexer::lexNumber() {
   const SourceLocation loc = currentLocation();
   unsigned base = 10;
   bool floating = false;
+  bool hexadecimal = false;
 
   if (currentByte() == '0') {
     const char prefix = peekByte();
     if (prefix == 'x' || prefix == 'X') {
       base = 16;
+      hexadecimal = true;
       advanceBytes(2);
+      const std::size_t digitsStart = cursor_;
       scanDigits(16, true);
+
       if (currentByte() == '.') {
         floating = true;
         advanceByte();
-        scanDigits(16, true);
+        scanDigits(16, false);
       }
+
       if (currentByte() == 'p' || currentByte() == 'P') {
         floating = true;
         scanExponent();
+      } else if (floating) {
+        error(loc, "hexadecimal floating-point literal requires a binary exponent");
       }
+
+      if (cursor_ == digitsStart && !floating)
+        error(loc, "expected hexadecimal digits after '0x'");
     } else if (prefix == 'b' || prefix == 'B') {
       base = 2;
       advanceBytes(2);
+      const std::size_t digitsStart = cursor_;
       scanDigits(2, true);
+      if (cursor_ == digitsStart)
+        error(loc, "expected binary digits after '0b'");
     } else if (prefix == 'o' || prefix == 'O') {
       base = 8;
       advanceBytes(2);
+      const std::size_t digitsStart = cursor_;
       scanDigits(8, true);
+      if (cursor_ == digitsStart)
+        error(loc, "expected octal digits after '0o'");
     } else {
       scanDigits(10, true);
       if (currentByte() == '.' && peekByte() != '.') {
         floating = true;
         advanceByte();
-        scanDigits(10, true);
+        scanDigits(10, false);
       }
       if (currentByte() == 'e' || currentByte() == 'E') {
         floating = true;
@@ -341,7 +387,7 @@ Token Lexer::lexNumber() {
     if (currentByte() == '.' && peekByte() != '.') {
       floating = true;
       advanceByte();
-      scanDigits(10, true);
+      scanDigits(10, false);
     }
     if (currentByte() == 'e' || currentByte() == 'E') {
       floating = true;
@@ -349,11 +395,19 @@ Token Lexer::lexNumber() {
     }
   }
 
-  scanFloatSuffix();
+  const bool hasFloatSuffix = scanFloatSuffix();
+  floating = floating || hasFloatSuffix;
 
   const std::string_view literal = source_.substr(start, cursor_ - start);
   if (lexer::hasInvalidNumericSeparators(literal))
     error(loc, "invalid placement of numeric separator");
+
+  if (!literal.empty() &&
+      (isAsciiIdentifierContinue(currentByte()) ||
+       (static_cast<unsigned char>(currentByte()) >= 0x80u &&
+        lexer::isUnicodeIdentifierContinue(source_, cursor_)))) {
+    error(currentLocation(), "invalid character after numeric literal");
+  }
 
   Token token = makeToken(
       floating ? tok::Kind::FloatingLiteral : tok::Kind::IntegerLiteral,
@@ -364,6 +418,7 @@ Token Lexer::lexNumber() {
   else
     finalizeInteger(token, base);
 
+  (void)hexadecimal;
   return token;
 }
 
@@ -625,9 +680,9 @@ bool Lexer::skipTrivia() {
       const unsigned char byte = static_cast<unsigned char>(currentByte());
       if (byte >= 0x80u)
         break;
-      if (currentByte() != ' ' && currentByte() != '\\t' &&
-          currentByte() != '\\n' && currentByte() != '\\r' &&
-          currentByte() != '\\v' && currentByte() != '\\f')
+      if (currentByte() != ' ' && currentByte() != '\t' &&
+          currentByte() != '\n' && currentByte() != '\r' &&
+          currentByte() != '\v' && currentByte() != '\f')
         break;
       advanceByte();
       consumed = true;
@@ -646,6 +701,8 @@ bool Lexer::skipTrivia() {
       consumed = true;
       continue;
     }
+    if (options_.retainComments && lexer::isCommentStart(source_, cursor_))
+      break;
     if (skipLineComment()) {
       consumed = true;
       continue;
@@ -979,6 +1036,136 @@ Token Lexer::lexUnknown() {
 
   advanceBytes(result.width);
   return makeToken(tok::Kind::Unknown, start, loc);
+}
+
+
+bool Lexer::scanIdentifier() {
+  if (!scanIdentifierContinuation())
+    return false;
+
+  while (!atEnd()) {
+    if (isAsciiIdentifierContinue(currentByte())) {
+      advanceByte();
+      continue;
+    }
+
+    if (static_cast<unsigned char>(currentByte()) < 0x80u)
+      break;
+
+    if (!options_.allowUnicodeIdentifiers)
+      break;
+
+    const unicode::DecodeResult result = unicode::decode(source_, cursor_);
+    if (!result.valid || !unicode::isIdentifierContinue(result.codePoint))
+      break;
+
+    advanceBytes(result.width);
+  }
+
+  return true;
+}
+
+bool Lexer::scanIdentifierContinuation() {
+  if (atEnd())
+    return false;
+
+  if (isAsciiIdentifierStart(currentByte())) {
+    advanceByte();
+    return true;
+  }
+
+  if (options_.allowUnicodeIdentifiers &&
+      static_cast<unsigned char>(currentByte()) >= 0x80u) {
+    const unicode::DecodeResult result = unicode::decode(source_, cursor_);
+    if (result.valid && unicode::isIdentifierStart(result.codePoint)) {
+      advanceBytes(result.width);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool Lexer::scanDigits(unsigned base, bool requireDigit) {
+  const std::size_t start = cursor_;
+  bool previousWasDigit = false;
+
+  while (!atEnd()) {
+    const char ch = currentByte();
+    if (isDigitForBase(ch, base)) {
+      advanceByte();
+      previousWasDigit = true;
+      continue;
+    }
+
+    if (ch == '_') {
+      if (!previousWasDigit || !isDigitForBase(peekByte(), base))
+        break;
+      advanceByte();
+      previousWasDigit = false;
+      continue;
+    }
+
+    break;
+  }
+
+  if (requireDigit && cursor_ == start)
+    return false;
+  return cursor_ != start;
+}
+
+bool Lexer::scanExponent() {
+  if (currentByte() != 'e' && currentByte() != 'E' &&
+      currentByte() != 'p' && currentByte() != 'P')
+    return false;
+
+  advanceByte();
+  if (currentByte() == '+' || currentByte() == '-')
+    advanceByte();
+
+  const std::size_t digitStart = cursor_;
+  scanDigits(10, true);
+  if (cursor_ == digitStart) {
+    error(currentLocation(), "expected exponent digits");
+    return false;
+  }
+  return true;
+}
+
+bool Lexer::scanFloatSuffix() {
+  if (currentByte() != 'f' && currentByte() != 'F')
+    return false;
+  if (isAsciiIdentifierContinue(peekByte()))
+    return false;
+  advanceByte();
+  return true;
+}
+
+bool Lexer::isDigitForBase(char ch, unsigned base) {
+  return lexer::isDigitForBase(ch, base);
+}
+
+unsigned Lexer::digitValue(char ch) {
+  return lexer::digitValue(ch);
+}
+
+bool Lexer::isAsciiIdentifierStart(char ch) {
+  const unsigned char byte = static_cast<unsigned char>(ch);
+  return (ch >= 'a' && ch <= 'z') ||
+         (ch >= 'A' && ch <= 'Z') ||
+         ch == '_';
+}
+
+bool Lexer::isAsciiIdentifierContinue(char ch) {
+  return isAsciiIdentifierStart(ch) || (ch >= '0' && ch <= '9');
+}
+
+std::string Lexer::decodeIdentifier(std::string_view text) {
+  return std::string(text);
+}
+
+std::string_view Lexer::stripNumericSeparators(std::string_view text) {
+  return text;
 }
 
 Token Lexer::lexImpl() {
