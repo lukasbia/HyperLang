@@ -112,13 +112,19 @@ private:
   Token lexImpl();
 
   bool skipTrivia();
+  bool skipHorizontalWhitespace();
   bool skipLineComment();
+  bool scanUTF8CodePoint();
+  bool consumeUTF8BOM();
+  bool isAtLineStart() const;
   bool skipBlockComment();
   bool skipHashbang();
 
   Token lexIdentifierOrKeyword();
   Token lexEscapedIdentifier();
   Token lexAttributedName();
+  Token lexComment();
+  Token makeEOFToken() const;
   Token lexNumber();
   Token lexString();
   Token lexCharacter();
