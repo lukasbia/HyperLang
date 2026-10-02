@@ -1,5 +1,5 @@
 //===--- ToolChain.cpp - HyperLang Tool Chain -----------------------------===//
-#include "hyperlang/Driver/ToolChains.h"
+#include "ToolChains.h"
 namespace hyperlang::driver {
 ToolChain::ToolChain(TargetInfo target) : target_(std::move(target)) {}
 const TargetInfo &ToolChain::target() const { return target_; }
