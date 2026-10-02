@@ -2,6 +2,16 @@
 
 add_library(HyperLangParse STATIC
   Lexer.cpp
+  ../../include/hyperlang/Parse/Lexer.h
+  ../../include/hyperlang/Parse/LexerDiagnostics.h
+  ../../include/hyperlang/Parse/LexerKeywords.h
+  ../../include/hyperlang/Parse/LexerLiterals.h
+  ../../include/hyperlang/Parse/LexerOperators.h
+  ../../include/hyperlang/Parse/LexerOptions.h
+  ../../include/hyperlang/Parse/LexerToken.h
+  ../../include/hyperlang/Parse/LexerTrivia.h
+  ../../include/hyperlang/Parse/LexerUnicode.h
+  ../../include/hyperlang/Parse/TokenKinds.h
 )
 
 target_include_directories(HyperLangParse
@@ -13,6 +23,7 @@ target_compile_features(HyperLangParse PUBLIC cxx_std_20)
 
 add_library(HyperLangBasic STATIC
   ../Basic/UTF8.cpp
+  ../../include/hyperlang/Basic/UTF8.h
 )
 
 target_include_directories(HyperLangBasic
@@ -21,5 +32,4 @@ target_include_directories(HyperLangBasic
 )
 
 target_compile_features(HyperLangBasic PUBLIC cxx_std_20)
-
 target_link_libraries(HyperLangParse PUBLIC HyperLangBasic)
