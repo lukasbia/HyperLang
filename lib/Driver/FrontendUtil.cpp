@@ -1,5 +1,5 @@
 //===--- FrontendUtil.cpp - HyperLang Frontend Driver Utilities -----------===//
-#include "hyperlang/Driver/FrontendUtil.h"
+#include "FrontendUtil.h"
 #include <filesystem>
 namespace hyperlang::driver {
 std::string FrontendUtil::stem(std::string_view path) {
