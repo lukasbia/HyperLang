@@ -57,28 +57,30 @@ void Lexer::advanceByte() {
   if (cursor_ >= source_.size())
     return;
 
-  const unsigned char byte = static_cast<unsigned char>(source_[cursor_++]);
-  if (byte == '\n') {
+  const unsigned char byte =
+      static_cast<unsigned char>(source_[cursor_++]);
+
+  if (byte == '\r') {
     ++line_;
     column_ = 1;
-  } else {
-    ++column_;
+    return;
   }
+
+  if (byte == '\n') {
+    if (cursor_ < 2 || source_[cursor_ - 2] != '\r') {
+      ++line_;
+      column_ = 1;
+    }
+    return;
+  }
+
+  ++column_;
 }
 
 void Lexer::advanceBytes(std::size_t count) {
   const std::size_t remaining = source_.size() - cursor_;
   count = std::min(count, remaining);
-  while (count != 0 && static_cast<unsigned char>(source_[cursor_]) < 0x80u) {
-    if (source_[cursor_] == '\n') {
-      ++line_;
-      column_ = 1;
-    } else {
-      ++column_;
-    }
-    ++cursor_;
-    --count;
-  }
+
   while (count != 0) {
     advanceByte();
     --count;
@@ -167,12 +169,19 @@ void Lexer::reset(std::size_t offset) {
   diagnostics_.clear();
 
   for (std::size_t index = 0; index < cursor_; ++index) {
-    if (source_[index] == '\n') {
+    if (source_[index] == '\r') {
       ++line_;
       column_ = 1;
-    } else {
-      ++column_;
+      continue;
     }
+    if (source_[index] == '\n') {
+      if (index == 0 || source_[index - 1] != '\r') {
+        ++line_;
+        column_ = 1;
+      }
+      continue;
+    }
+    ++column_;
   }
 }
 
