@@ -1,5 +1,5 @@
 //===--- WindowsToolChains.cpp - Windows Tool Chain ----------------------===//
-#include "hyperlang/Driver/ToolChains.h"
+#include "ToolChains.h"
 namespace hyperlang::driver {
 WindowsToolChain::WindowsToolChain(TargetInfo target) : ToolChain(std::move(target)) {}
 std::string WindowsToolChain::compiler() const { return "clang++"; }
