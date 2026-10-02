@@ -1,6 +1,6 @@
 //===--- Driver.cpp - HyperLang Compiler Driver ---------------------------===//
-#include "hyperlang/Driver/Driver.h"
-#include "hyperlang/Driver/ToolChains.h"
+#include "Driver.h"
+#include "ToolChains.h"
 #include <utility>
 namespace hyperlang::driver {
 Driver::Driver() = default;
