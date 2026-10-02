@@ -6,9 +6,9 @@ static int failures=0;
 static void expect(bool value,const char*name){if(!value){std::cerr<<"FAIL: "<<name<<"\n";++failures;}}
 static void expectKind(const std::vector<Token>&ts,std::size_t i,TokenKind k,const char*name){expect(i<ts.size()&&ts[i].kind==k,name);}
 int main(){
- Lexer lexer(R"(function hello(name) { var message: string = "Hello, 世界"; return message })");
+ Lexer lexer(R"(func hello(name) { var message: string = "Hello, 世界"; return message })");
  auto tokens=lexer.lexAll();
- expectKind(tokens,0,TokenKind::Keyword,"function keyword");
+ expectKind(tokens,0,TokenKind::Keyword,"func keyword");
  expectKind(tokens,1,TokenKind::Identifier,"function name");
  expectKind(tokens,2,TokenKind::LParen,"left parenthesis");
  expectKind(tokens,3,TokenKind::Identifier,"parameter");
