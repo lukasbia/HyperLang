@@ -3,7 +3,11 @@
 add_library(HyperLangParse STATIC
   Lexer.cpp
   Parser.cpp
+  ASTDump.cpp
   ../../include/hyperlang/Parse/AST.h
+  ../../include/hyperlang/Parse/ASTDump.h
+  ../../include/hyperlang/Parse/ASTVisitor.h
+  ../../include/hyperlang/Parse/ParserResult.h
   ../../include/hyperlang/Parse/Parser.h
   ../../include/hyperlang/Parse/ParserDiagnostics.h
   ../../include/hyperlang/Parse/Lexer.h
