@@ -16,6 +16,8 @@ bool containsUnicodeConfusable(std::string_view text);
 bool isVersionComponent(std::string_view text);
 bool isIfConfigDirective(tok::Kind kind);
 bool isRequestKeyword(tok::Kind kind);
+bool isAssignmentOperator(tok::Kind kind);
+bool isUnaryOperator(tok::Kind kind);
 bool isRegexDelimiter(char ch);
 }
 #endif
