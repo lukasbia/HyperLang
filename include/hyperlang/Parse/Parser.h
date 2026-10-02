@@ -19,7 +19,7 @@ public:
   std::size_t offset() const;
 private:
   Lexer lexer_;
-  DiagnosticList diagnostics_;
+  mutable DiagnosticList diagnostics_;
   ParserDiagnostics parserDiagnostics_;
   mutable std::size_t lexerDiagnosticsCount_ = 0;
   void syncLexerDiagnostics() const;
