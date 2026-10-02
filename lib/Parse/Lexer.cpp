@@ -239,7 +239,7 @@ Token Lexer::lexAttributedName() {
     advanceByte();
 
   const std::string_view spelling = source_.substr(start, cursor_ - start);
-  for (const AttributeEntry &entry : lexer::AttributeTable)
+  for (const lexer::AttributeEntry &entry : lexer::AttributeTable)
     if (entry.spelling == spelling)
       return makeToken(entry.kind, start, loc);
 
