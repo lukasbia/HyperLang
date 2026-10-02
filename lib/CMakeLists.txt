@@ -1,7 +1,5 @@
 add_library(hyper_parse
     Parse/Lexer.cpp
-    Parse/Token.cpp
-    Parse/SourceLocation.cpp
 )
 target_include_directories(hyper_parse PUBLIC
     ${PROJECT_SOURCE_DIR}/include
