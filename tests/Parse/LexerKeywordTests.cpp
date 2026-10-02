@@ -3,7 +3,7 @@
 using namespace hyper::parse;
 static int failures=0; static void check(bool v,const char*n){if(!v){std::cerr<<"FAIL "<<n<<"\n";++failures;}}
 int main(){
- { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_0"); check(t.text=="function","kw_text_0"); }
+ { Lexer l("func"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_func"); check(t.text=="func","kw_text_func"); }
  { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_1"); check(t.text=="var","kw_text_1"); }
  { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_2"); check(t.text=="const","kw_text_2"); }
  { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_3"); check(t.text=="struct","kw_text_3"); }
@@ -88,7 +88,7 @@ int main(){
  { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_82"); check(t.text=="createData","kw_text_82"); }
  { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_83"); check(t.text=="from","kw_text_83"); }
  { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_84"); check(t.text=="import","kw_text_84"); }
- { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_85"); check(t.text=="function","kw_text_85"); }
+ { Lexer l("func"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_85"); check(t.text=="func","kw_text_85"); }
  { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_86"); check(t.text=="var","kw_text_86"); }
  { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_87"); check(t.text=="const","kw_text_87"); }
  { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_88"); check(t.text=="struct","kw_text_88"); }
@@ -173,7 +173,7 @@ int main(){
  { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_167"); check(t.text=="createData","kw_text_167"); }
  { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_168"); check(t.text=="from","kw_text_168"); }
  { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_169"); check(t.text=="import","kw_text_169"); }
- { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_170"); check(t.text=="function","kw_text_170"); }
+ { Lexer l("func"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_170"); check(t.text=="func","kw_text_170"); }
  { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_171"); check(t.text=="var","kw_text_171"); }
  { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_172"); check(t.text=="const","kw_text_172"); }
  { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_173"); check(t.text=="struct","kw_text_173"); }
@@ -258,7 +258,7 @@ int main(){
  { Lexer l("createData"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_252"); check(t.text=="createData","kw_text_252"); }
  { Lexer l("from"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_253"); check(t.text=="from","kw_text_253"); }
  { Lexer l("import"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_254"); check(t.text=="import","kw_text_254"); }
- { Lexer l("function"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_255"); check(t.text=="function","kw_text_255"); }
+ { Lexer l("func"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_255"); check(t.text=="func","kw_text_255"); }
  { Lexer l("var"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_256"); check(t.text=="var","kw_text_256"); }
  { Lexer l("const"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_257"); check(t.text=="const","kw_text_257"); }
  { Lexer l("struct"); auto t=l.lex(); check(t.kind==TokenKind::Keyword,"kw_258"); check(t.text=="struct","kw_text_258"); }
