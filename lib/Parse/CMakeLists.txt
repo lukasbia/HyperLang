@@ -4,9 +4,23 @@ add_library(HyperLangParse STATIC
   Lexer.cpp
   Parser.cpp
   ASTDump.cpp
+  Confusables.cpp
+  ParseDecl.cpp
+  ParseDeclName.cpp
+  ParseExpr.cpp
+  ParseGeneric.cpp
+  ParseIfConfig.cpp
+  ParsePattern.cpp
+  ParseRegex.cpp
+  ParseRequests.cpp
+  ParseStmt.cpp
+  ParseType.cpp
+  ParseVersion.cpp
+  PersistentParserState.cpp
   ../../include/hyperlang/Parse/AST.h
   ../../include/hyperlang/Parse/ASTDump.h
   ../../include/hyperlang/Parse/ASTVisitor.h
+  ../../include/hyperlang/Parse/ParseSupport.h
   ../../include/hyperlang/Parse/ParserResult.h
   ../../include/hyperlang/Parse/Parser.h
   ../../include/hyperlang/Parse/ParserDiagnostics.h
