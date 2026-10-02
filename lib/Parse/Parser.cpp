@@ -21,6 +21,14 @@ void ParserDiagnostics::note(SourceLocation l, std::string_view m) {
 Parser::Parser(std::string_view source, LexerOptions options)
     : lexer_(source, options), parserDiagnostics_(diagnostics_) {}
 
+void Parser::syncLexerDiagnostics() const {
+  const DiagnosticList &lexerDiagnostics = lexer_.diagnostics();
+  while (lexerDiagnosticsCount_ < lexerDiagnostics.size()) {
+    diagnostics_.push_back(lexerDiagnostics[lexerDiagnosticsCount_]);
+    ++lexerDiagnosticsCount_;
+  }
+}
+
 const Token &Parser::current() { return lexer_.peek(); }
 
 Token Parser::consume() { return lexer_.lex(); }
@@ -62,10 +70,12 @@ void Parser::diagnoseUnexpected(std::string_view context) {
 }
 
 const DiagnosticList &Parser::diagnostics() const {
+  syncLexerDiagnostics();
   return diagnostics_;
 }
 
 bool Parser::hasErrors() const {
+  syncLexerDiagnostics();
   if (lexer_.hasErrors())
     return true;
   for (const Diagnostic &d : diagnostics_)
@@ -85,87 +95,27 @@ bool Parser::isStatementStart(tok::Kind k) const {
 }
 
 bool Parser::isTypeStart(tok::Kind k) const {
-  switch (k) {
-  case tok::Kind::Identifier:
-  case tok::Kind::EscapedIdentifier:
-  case tok::Kind::KwInt:
-  case tok::Kind::KwUInt:
-  case tok::Kind::KwInt8:
-  case tok::Kind::KwInt16:
-  case tok::Kind::KwInt32:
-  case tok::Kind::KwInt64:
-  case tok::Kind::KwUInt8:
-  case tok::Kind::KwUInt16:
-  case tok::Kind::KwUInt32:
-  case tok::Kind::KwUInt64:
-  case tok::Kind::KwFloat:
-  case tok::Kind::KwDouble:
-  case tok::Kind::KwString:
-  case tok::Kind::KwBool:
-  case tok::Kind::KwNum:
-  case tok::Kind::KwDecimal:
-  case tok::Kind::KwBytes:
-  case tok::Kind::KwArray:
-  case tok::Kind::KwMap:
-  case tok::Kind::KwSet:
-  case tok::Kind::KwTuple:
-    return true;
-  default:
-    return false;
-  }
+  return k == tok::Kind::Identifier ||
+         k == tok::Kind::EscapedIdentifier ||
+         parse::isBuiltinTypeToken(k);
 }
 
 bool Parser::isAssignmentOperator(tok::Kind k) const {
-  switch (k) {
-  case tok::Kind::Equal:
-  case tok::Kind::PlusEqual:
-  case tok::Kind::MinusEqual:
-  case tok::Kind::StarEqual:
-  case tok::Kind::SlashEqual:
-  case tok::Kind::PercentEqual:
-  case tok::Kind::AmpersandEqual:
-  case tok::Kind::PipeEqual:
-  case tok::Kind::CaretEqual:
-    return true;
-  default:
-    return false;
-  }
+  return parse::isAssignmentOperator(k);
 }
 
 bool Parser::isUnaryOperator(tok::Kind k) const {
-  return k == tok::Kind::Plus || k == tok::Kind::Minus ||
-         k == tok::Kind::Bang || k == tok::Kind::Tilde ||
-         k == tok::Kind::Increment || k == tok::Kind::Decrement;
+  return parse::isUnaryOperator(k);
 }
 
 int Parser::precedence(tok::Kind k) const {
-  switch (k) {
-  case tok::Kind::PipePipe: return 10;
-  case tok::Kind::AmpersandAmpersand: return 20;
-  case tok::Kind::EqualEqual:
-  case tok::Kind::NotEqual: return 30;
-  case tok::Kind::Less:
-  case tok::Kind::LessEqual:
-  case tok::Kind::Greater:
-  case tok::Kind::GreaterEqual: return 40;
-  case tok::Kind::Pipe: return 45;
-  case tok::Kind::Caret: return 46;
-  case tok::Kind::Ampersand: return 47;
-  case tok::Kind::Plus:
-  case tok::Kind::Minus: return 50;
-  case tok::Kind::Star:
-  case tok::Kind::Slash:
-  case tok::Kind::Percent: return 60;
-  default: return -1;
-  }
+  return parse::expressionPrecedence(k);
 }
 
 void Parser::synchronizeToDeclaration() {
   while (!at(tok::Kind::EndOfFile)) {
-    if (at(tok::Kind::KwFunc) || at(tok::Kind::KwImport) ||
-        at(tok::Kind::KwVar) || at(tok::Kind::KwLet) ||
-        at(tok::Kind::KwConst) || at(tok::Kind::KwStruct) ||
-        at(tok::Kind::KwClass) || at(tok::Kind::KwEnum))
+    if (isDeclarationStart(current().kind) ||
+        isStatementStart(current().kind))
       return;
     consume();
   }
@@ -186,6 +136,7 @@ void Parser::synchronizeToStatement() {
 ParserResult Parser::parse() {
   ParserResult result;
   result.sourceFile = parseSourceFile();
+  syncLexerDiagnostics();
   result.diagnostics = diagnostics_;
   return result;
 }
@@ -628,10 +579,13 @@ ast::ExpressionPtr Parser::parseAssignment() {
   if (isAssignmentOperator(current().kind)) {
     tok::Kind op = consume().kind;
     auto rhs = parseAssignment();
-    if (!rhs)
-      parserDiagnostics_.error(current().range.start, "expected expression after assignment operator");
-    return std::make_unique<ast::AssignmentExpression>(op, std::move(lhs),
-                                                       std::move(rhs), rangeFrom(start));
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after assignment operator");
+      return lhs;
+    }
+    return std::make_unique<ast::AssignmentExpression>(
+        op, std::move(lhs), std::move(rhs), rangeFrom(start));
   }
   return lhs;
 }
@@ -645,6 +599,11 @@ ast::ExpressionPtr Parser::parseRange() {
   if (at(tok::Kind::DotDot) || at(tok::Kind::DotDotLess)) {
     bool inclusive = consume().kind == tok::Kind::DotDot;
     auto rhs = parseLogicalOr();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after range operator");
+      return lhs;
+    }
     return std::make_unique<ast::RangeExpression>(
         std::move(lhs), std::move(rhs), inclusive, rangeFrom(start));
   }
@@ -657,6 +616,11 @@ ast::ExpressionPtr Parser::parseLogicalOr() {
     SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseLogicalAnd();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after operator");
+      return expression;
+    }
     expression = std::make_unique<ast::BinaryExpression>(
         op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
@@ -669,6 +633,11 @@ ast::ExpressionPtr Parser::parseLogicalAnd() {
     SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseEquality();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after operator");
+      return expression;
+    }
     expression = std::make_unique<ast::BinaryExpression>(
         op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
@@ -677,10 +646,16 @@ ast::ExpressionPtr Parser::parseLogicalAnd() {
 
 ast::ExpressionPtr Parser::parseEquality() {
   auto expression = parseComparison();
-  while (at(tok::Kind::EqualEqual) || at(tok::Kind::NotEqual)) {
+  while (at(tok::Kind::EqualEqual) || at(tok::Kind::NotEqual) ||
+         at(tok::Kind::TildeEqual)) {
     SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseComparison();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after operator");
+      return expression;
+    }
     expression = std::make_unique<ast::BinaryExpression>(
         op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
@@ -693,6 +668,11 @@ ast::ExpressionPtr Parser::parseComparison() {
     SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseTerm();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after operator");
+      return expression;
+    }
     expression = std::make_unique<ast::BinaryExpression>(
         op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
@@ -701,12 +681,18 @@ ast::ExpressionPtr Parser::parseComparison() {
 
 ast::ExpressionPtr Parser::parseTerm() {
   auto expression = parseFactor();
-  while (at(tok::Kind::Plus) || at(tok::Kind::Minus) ||
+  while (at(tok::Kind::ShiftLeft) || at(tok::Kind::ShiftRight) ||
+         at(tok::Kind::Plus) || at(tok::Kind::Minus) ||
          at(tok::Kind::Pipe) || at(tok::Kind::Caret) ||
          at(tok::Kind::Ampersand)) {
     SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseFactor();
+    if (!rhs) {
+      parserDiagnostics_.error(current().range.start,
+                               "expected expression after operator");
+      return expression;
+    }
     expression = std::make_unique<ast::BinaryExpression>(
         op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
