@@ -2,6 +2,10 @@
 
 add_library(HyperLangParse STATIC
   Lexer.cpp
+  Parser.cpp
+  ../../include/hyperlang/Parse/AST.h
+  ../../include/hyperlang/Parse/Parser.h
+  ../../include/hyperlang/Parse/ParserDiagnostics.h
   ../../include/hyperlang/Parse/Lexer.h
   ../../include/hyperlang/Parse/LexerDiagnostics.h
   ../../include/hyperlang/Parse/LexerKeywords.h
