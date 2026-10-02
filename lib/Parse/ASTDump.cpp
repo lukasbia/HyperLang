@@ -1,5 +1,6 @@
 //===--- ASTDump.cpp - HyperLang AST Debug Dump --------------------------===//
 #include "hyperlang/Parse/ASTDump.h"
+#include "hyperlang/Parse/ASTVisitor.h"
 #include "hyperlang/Parse/TokenKinds.h"
 #include <ostream>
 #include <string>
@@ -10,7 +11,7 @@ void indent(std::ostream &out, unsigned depth) { for (unsigned i = 0; i < depth;
 
 void dumpNode(const Node &node, std::ostream &out, unsigned depth) {
   indent(out, depth);
-  out << tok::getTokenName(tok::Kind::Unknown) << " ";
+
   switch (node.kind) {
   case NodeKind::SourceFile: out << "SourceFile"; break;
   case NodeKind::Attribute: out << "Attribute"; break;
