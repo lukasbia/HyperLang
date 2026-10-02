@@ -384,12 +384,93 @@ Token Lexer::punctuation() {
     }
 }
 Token Lexer::lexImpl() {
-    skipTrivia();if(atEnd())return make(TokenKind::Eof,offset_);
-    unsigned char c=static_cast<unsigned char>(current());
-    if(start(c)||c>=0x80||c==static_cast<unsigned char>(96))return identifier();
-    if(dec(c))return number();
-    return punctuation();
+    // Main lexer dispatch. Trivia is consumed before token classification.
+    skipTrivia();
+
+    if (atEnd())
+        return make(TokenKind::Eof, offset_);
+
+    const std::size_t tokenStart = offset_;
+    const unsigned char c =
+        static_cast<unsigned char>(current());
+
+    switch (c) {
+    case '\n':
+    case '\r':
+    case ' ':
+    case '\t':
+    case '\v':
+    case '\f':
+        skipTrivia();
+        return lexImpl();
+
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        return number();
+
+    case 96:
+        return identifier();
+
+    case '"':
+        return stringLiteral();
+
+    case '\'':
+        return characterLiteral();
+
+    case '@':
+        return specialIdentifier();
+
+    case '(':
+    case ')':
+    case '{':
+    case '}':
+    case '[':
+    case ']':
+    case ',':
+    case '.':
+    case ':':
+    case ';':
+    case '?':
+    case '!':
+    case '+':
+    case '-':
+    case '*':
+    case '/':
+    case '%':
+    case '&':
+    case '|':
+    case '^':
+    case '~':
+    case '=':
+    case '<':
+    case '>':
+        return punctuation();
+
+    default:
+        break;
+    }
+
+    if (isASCIIIdentifierStart(c) || c >= 0x80)
+        return identifier();
+
+    ++offset_;
+    diagnose(
+        DiagnosticSeverity::Error,
+        tokenStart,
+        offset_,
+        "unexpected character");
+
+    return make(TokenKind::Unknown, tokenStart);
 }
+
 Token Lexer::lex() {
     if(!lookahead_.empty()){Token t=std::move(lookahead_.front());lookahead_.erase(lookahead_.begin());return t;}
     return lexImpl();
