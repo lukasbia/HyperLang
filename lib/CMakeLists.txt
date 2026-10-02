@@ -1,9 +1,5 @@
 add_library(hyper_parse
     Parse/Lexer.cpp
-    Parse/LexerLiterals.cpp
-    Parse/LexerOperators.cpp
-    Parse/LexerUnicode.cpp
-    Parse/LexerDiagnostics.cpp
     Parse/Token.cpp
     Parse/SourceLocation.cpp
 )
