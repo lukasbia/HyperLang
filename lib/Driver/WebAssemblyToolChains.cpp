@@ -1,5 +1,5 @@
 //===--- WebAssemblyToolChains.cpp - WebAssembly Tool Chain ---------------===//
-#include "hyperlang/Driver/ToolChains.h"
+#include "ToolChains.h"
 namespace hyperlang::driver {
 WebAssemblyToolChain::WebAssemblyToolChain(TargetInfo target) : ToolChain(std::move(target)) {}
 std::string WebAssemblyToolChain::compiler() const { return "clang"; }
