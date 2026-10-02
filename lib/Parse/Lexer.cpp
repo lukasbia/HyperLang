@@ -1099,8 +1099,25 @@ Token Lexer::lexQuestion() {
 Token Lexer::lexHash() {
   const std::size_t start = cursor_;
   const SourceLocation loc = currentLocation();
+
   advanceByte();
-  return makeToken(tok::Kind::Hash, start, loc);
+
+  const std::size_t nameStart = cursor_;
+  while (isAsciiIdentifierContinue(currentByte()))
+    advanceByte();
+
+  if (cursor_ == nameStart)
+    return makeToken(tok::Kind::Hash, start, loc);
+
+  const std::string_view spelling = source_.substr(start, cursor_ - start);
+  for (const lexer::AttributeEntry &entry : lexer::AttributeTable) {
+    if (entry.spelling == spelling)
+      return makeToken(entry.kind, start, loc);
+  }
+
+  Token token = makeToken(tok::Kind::AttributedName, start, loc);
+  token.decodedText = std::string(spelling.substr(1));
+  return token;
 }
 
 
