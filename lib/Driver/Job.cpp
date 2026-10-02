@@ -1,5 +1,5 @@
 //===--- Job.cpp - HyperLang Driver Jobs ---------------------------------===//
-#include "hyperlang/Driver/Job.h"
+#include "Job.h"
 namespace hyperlang::driver {
 Job::Job(ActionKind k, std::string t, std::vector<std::string> a, std::string o)
     : kind(k), tool(std::move(t)), arguments(std::move(a)), output(std::move(o)) {}
