@@ -9,7 +9,7 @@ namespace hyper::parse {
 namespace {
 struct Keyword { std::string_view spelling; TokenKind kind; };
 constexpr std::array keywords{
-    Keyword{"func",TokenKind::Keyword}, Keyword{"function",TokenKind::Keyword},
+    Keyword{"func",TokenKind::Keyword},
     Keyword{"var",TokenKind::Keyword}, Keyword{"const",TokenKind::Keyword},
     Keyword{"struct",TokenKind::Keyword}, Keyword{"class",TokenKind::Keyword},
     Keyword{"enum",TokenKind::Keyword}, Keyword{"protocol",TokenKind::Keyword},
