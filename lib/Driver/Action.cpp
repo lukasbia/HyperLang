@@ -1,5 +1,5 @@
 //===--- Action.cpp - HyperLang Driver Actions ----------------------------===//
-#include "hyperlang/Driver/Action.h"
+#include "Action.h"
 namespace hyperlang::driver {
 const char *actionKindName(ActionKind kind) {
   switch (kind) {
