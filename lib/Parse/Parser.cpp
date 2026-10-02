@@ -1,6 +1,7 @@
 //===--- Parser.cpp - HyperLang Recursive-Descent Parser ------------------===//
 
 #include "hyperlang/Parse/Parser.h"
+#include "hyperlang/Parse/ParseSupport.h"
 
 #include <sstream>
 #include <utility>
@@ -76,34 +77,11 @@ bool Parser::hasErrors() const {
 std::size_t Parser::offset() const { return lexer_.offset(); }
 
 bool Parser::isDeclarationStart(tok::Kind k) const {
-  switch (k) {
-  case tok::Kind::KwFunc:
-  case tok::Kind::KwVar:
-  case tok::Kind::KwLet:
-  case tok::Kind::KwConst:
-  case tok::Kind::KwImport:
-  case tok::Kind::KwStruct:
-  case tok::Kind::KwClass:
-  case tok::Kind::KwEnum:
-  case tok::Kind::KwProtocol:
-  case tok::Kind::KwExtension:
-    return true;
-  default:
-    return false;
-  }
+  return parse::isDeclarationStarter(k);
 }
 
 bool Parser::isStatementStart(tok::Kind k) const {
-  return isDeclarationStart(k) || k == tok::Kind::KwIf ||
-         k == tok::Kind::KwWhile || k == tok::Kind::KwFor ||
-         k == tok::Kind::KwGuard || k == tok::Kind::KwDefer ||
-         k == tok::Kind::KwSwitch || k == tok::Kind::KwReturn ||
-         k == tok::Kind::KwBreak || k == tok::Kind::KwContinue ||
-         k == tok::Kind::OpenBrace || k == tok::Kind::Identifier ||
-         k == tok::Kind::EscapedIdentifier || k == tok::Kind::IntegerLiteral ||
-         k == tok::Kind::FloatingLiteral || k == tok::Kind::StringLiteral ||
-         k == tok::Kind::CharacterLiteral || k == tok::Kind::OpenParen ||
-         k == tok::Kind::OpenBracket;
+  return isDeclarationStart(k) || parse::isStatementStarter(k);
 }
 
 bool Parser::isTypeStart(tok::Kind k) const {
@@ -373,12 +351,14 @@ std::unique_ptr<ast::VariableDeclaration> Parser::parseVariableDeclaration() {
   declaration->isMutable = introducer.kind == tok::Kind::KwVar;
   declaration->isConstant = introducer.kind == tok::Kind::KwConst;
 
-  if (!current().isIdentifier()) {
+  if (!parse::isDeclarationNameToken(current().kind)) {
     parserDiagnostics_.error(current().range.start, "expected variable name");
     return declaration;
   }
 
   declaration->name = tokenText(consume());
+  if (parse::containsUnicodeConfusable(declaration->name))
+    parserDiagnostics_.warning(current().range.start, "identifier contains Unicode characters that may be visually confusable");
 
   if (consumeIf(tok::Kind::Colon))
     declaration->type = parseType();
@@ -403,10 +383,12 @@ std::unique_ptr<ast::FunctionDeclaration> Parser::parseFunctionDeclaration() {
 
   expect(tok::Kind::KwFunc, "expected 'func'");
 
-  if (!current().isIdentifier() && !at(tok::Kind::KwMain)) {
+  if (!parse::isDeclarationNameToken(current().kind)) {
     parserDiagnostics_.error(current().range.start, "expected function name");
   } else {
     function->name = tokenText(consume());
+    if (parse::containsUnicodeConfusable(function->name))
+      parserDiagnostics_.warning(current().range.start, "identifier contains Unicode characters that may be visually confusable");
   }
 
   expect(tok::Kind::OpenParen, "expected '(' after function name");
@@ -495,7 +477,7 @@ std::unique_ptr<ast::ForStatement> Parser::parseForStatement() {
   SourceLocation start = consume().range.start;
   auto statement = std::make_unique<ast::ForStatement>();
 
-  if (current().isIdentifier())
+  if (parse::isPatternToken(current().kind))
     statement->pattern = tokenText(consume());
   else
     parserDiagnostics_.error(current().range.start, "expected loop pattern");
@@ -909,8 +891,7 @@ ast::ExpressionPtr Parser::parseLiteral() {
 }
 
 ast::ExpressionPtr Parser::parsePrimary() {
-  if (current().isIdentifier() || at(tok::Kind::KwSelf) ||
-      at(tok::Kind::KwSuper) || at(tok::Kind::KwThis))
+  if (parse::isExpressionNameToken(current().kind))
     return parseIdentifierExpression();
 
   if (at(tok::Kind::IntegerLiteral) || at(tok::Kind::FloatingLiteral) ||
