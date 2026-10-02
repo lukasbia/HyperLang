@@ -395,7 +395,7 @@ Token Lexer::lexNumber() {
     }
   }
 
-  const bool hasFloatSuffix = scanFloatSuffix();
+  const bool hasFloatSuffix = (floating || !hexadecimal) && scanFloatSuffix();
   floating = floating || hasFloatSuffix;
 
   const std::string_view literal = source_.substr(start, cursor_ - start);
