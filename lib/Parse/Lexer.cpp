@@ -63,9 +63,6 @@ static constexpr bool isASCIIDecimalDigitByte(unsigned char byte) noexcept {
          byte <= static_cast<unsigned char>('9');
 }
 
-static constexpr bool isASCIIHexDigitByte(unsigned char byte) noexcept {
-  return asciiDigitValue(byte) < 16u;
-}
 
 static constexpr bool isASCIIIdentifierStartByte(unsigned char byte) noexcept {
   return isASCIIAlphaByte(byte) || byte == static_cast<unsigned char>('_');
@@ -1302,69 +1299,12 @@ std::string_view Lexer::stripNumericSeparators(std::string_view text) {
 }
 
 
-static bool validateASCIIByteForSource(unsigned char byte) noexcept {
-  if (byte == 0)
-    return false;
-  if (byte >= 0x80u)
-    return true;
-  return !isASCIIControlByte(byte) || isASCIIWhitespaceByte(byte);
-}
 
-static bool isPotentialIdentifierContinuation(std::string_view source,
-                                              std::size_t offset) noexcept {
-  if (offset >= source.size())
-    return false;
 
-  const unsigned char byte =
-      static_cast<unsigned char>(source[offset]);
 
-  if (byte < 0x80u)
-    return isASCIIIdentifierContinueByte(byte);
 
-  const unicode::DecodeResult result = unicode::decode(source, offset);
-  return result.valid && unicode::isIdentifierContinue(result.codePoint);
-}
 
-static bool isPotentialIdentifierStart(std::string_view source,
-                                       std::size_t offset) noexcept {
-  if (offset >= source.size())
-    return false;
 
-  const unsigned char byte =
-      static_cast<unsigned char>(source[offset]);
-
-  if (byte < 0x80u)
-    return isASCIIIdentifierStartByte(byte);
-
-  const unicode::DecodeResult result = unicode::decode(source, offset);
-  return result.valid && unicode::isIdentifierStart(result.codePoint);
-}
-
-static bool isNumericContinuation(std::string_view source,
-                                  std::size_t offset) noexcept {
-  if (offset >= source.size())
-    return false;
-
-  const unsigned char byte =
-      static_cast<unsigned char>(source[offset]);
-
-  if (byte < 0x80u)
-    return isASCIIDecimalDigitByte(byte) || byte == '_';
-
-  return false;
-}
-
-static bool isOperatorLead(unsigned char byte) noexcept {
-  return byte < 0x80u && isASCIIOperatorByte(byte);
-}
-
-static bool isQuoteLead(unsigned char byte) noexcept {
-  return byte < 0x80u && isASCIIQuoteByte(byte);
-}
-
-static bool isPunctuationLead(unsigned char byte) noexcept {
-  return byte < 0x80u && isASCIIPunctuationByte(byte);
-}
 
 Token Lexer::lexImpl() {
   skipTrivia();
