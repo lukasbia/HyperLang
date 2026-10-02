@@ -63,9 +63,6 @@ static constexpr bool isASCIIDecimalDigitByte(unsigned char byte) noexcept {
          byte <= static_cast<unsigned char>('9');
 }
 
-static constexpr bool isASCIIHexDigitByte(unsigned char byte) noexcept {
-  return asciiDigitValue(byte) < 16u;
-}
 
 static constexpr bool isASCIIIdentifierStartByte(unsigned char byte) noexcept {
   return isASCIIAlphaByte(byte) || byte == static_cast<unsigned char>('_');
