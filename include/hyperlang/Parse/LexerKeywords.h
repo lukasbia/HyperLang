@@ -210,7 +210,7 @@ constexpr bool isAttributeSpelling(std::string_view spelling) noexcept {
 constexpr tok::Kind classifyKeyword(std::string_view spelling) noexcept {
   const std::uint64_t hash = identifierHash(spelling);
   for (const KeywordEntry &entry : KeywordTable)
-    if (identifierHash(entry.spelling) == hash && entry.spelling == spelling)
+    if (entry.hash == hash && entry.spelling == spelling)
       return entry.kind;
   return tok::Kind::Identifier;
 }
