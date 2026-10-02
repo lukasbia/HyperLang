@@ -67,3 +67,5 @@ bool isUnaryOperator(tok::Kind kind) {
     return false;
   }
 }
+
+} // namespace hyperlang::parse
