@@ -1,5 +1,5 @@
 //===--- Compilation.cpp - HyperLang Compilation Planning -----------------===//
-#include "hyperlang/Driver/Compilation.h"
+#include "Compilation.h"
 namespace hyperlang::driver {
 void Compilation::addJob(Job job) { jobs_.push_back(std::move(job)); }
 const std::vector<Job> &Compilation::jobs() const { return jobs_; }
