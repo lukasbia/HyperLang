@@ -33,6 +33,8 @@ bool isExpressionNameToken(tok::Kind kind) {
 }
 }
 
+namespace hyperlang::parse {
+
 bool isAssignmentOperator(tok::Kind kind) {
   switch (kind) {
   case tok::Kind::Equal:
