@@ -38,6 +38,7 @@ bool parseOptions(int argc, char **argv, Options &options) {
     }
     if (argument == "--help" || argument == "-h") {
       printUsage(std::cout);
+      options.input.clear();
       return false;
     }
     if (!argument.empty() && argument.front() == '-') {
@@ -127,7 +128,11 @@ int runParser(std::string_view source, std::string_view path, bool dumpAST) {
 int main(int argc, char **argv) {
   Options options;
   if (!parseOptions(argc, argv, options))
-    return options.input.empty() ? 2 : 0;
+    return options.input.empty() && argc > 1 &&
+                   (std::string_view(argv[1]) == "--help" ||
+                    std::string_view(argv[1]) == "-h")
+               ? 0
+               : 2;
 
   std::string source;
   if (!readFile(options.input, source)) {
