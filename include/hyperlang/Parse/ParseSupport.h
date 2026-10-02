@@ -4,6 +4,7 @@
 #include "hyperlang/Parse/TokenKinds.h"
 #include <string_view>
 namespace hyperlang::parse {
+bool isDeclarationStarter(tok::Kind kind);
 bool isDeclarationNameToken(tok::Kind kind);
 bool isExpressionNameToken(tok::Kind kind);
 bool isBuiltinTypeToken(tok::Kind kind);
