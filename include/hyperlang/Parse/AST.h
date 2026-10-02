@@ -74,7 +74,7 @@ struct VariableDeclaration : Statement {
   std::string name;
   std::unique_ptr<TypeNode> type;
   ExpressionPtr initializer;
-  VariableDeclaration(std::string n, SourceRange r = {}) : Statement(NodeKind::VariableDeclaration, r), name(std::move(n)) {}
+  VariableDeclaration(std::string n = {}, SourceRange r = {}) : Statement(NodeKind::VariableDeclaration, r), name(std::move(n)) {}
 };
 
 struct FunctionDeclaration : Statement {
@@ -85,7 +85,7 @@ struct FunctionDeclaration : Statement {
   std::unique_ptr<TypeNode> returnType;
   std::unique_ptr<BlockStatement> body;
   std::vector<std::unique_ptr<Attribute>> attributes;
-  FunctionDeclaration(std::string n, SourceRange r = {}) : Statement(NodeKind::FunctionDeclaration, r), name(std::move(n)) {}
+  FunctionDeclaration(std::string n = {}, SourceRange r = {}) : Statement(NodeKind::FunctionDeclaration, r), name(std::move(n)) {}
 };
 
 struct ReturnStatement : Statement {
