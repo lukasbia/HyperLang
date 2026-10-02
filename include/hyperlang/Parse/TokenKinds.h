@@ -20,6 +20,7 @@ enum class Kind : std::uint16_t {
   AttributedName,
   Comment,
   KwFunc,
+  KwFunction,
   KwEndIf,
   KwClose,
   KwGet,
@@ -95,6 +96,7 @@ enum class Kind : std::uint16_t {
   KwOptional,
   KwResult,
   KwError,
+  KwErrorMessage,
   KwPanic,
   KwMove,
   KwCopy,
@@ -264,6 +266,9 @@ constexpr std::string_view getTokenName(Kind kind) {
   case Kind::AttributedName: return "attributed_name";
   case Kind::Comment: return "comment";
   case Kind::KwFunc: return "func";
+  case Kind::KwBina: return "bina";
+  case Kind::KwErrorMessage: return "errorMessage";
+  case Kind::KwFunction: return "function";
   case Kind::KwMain: return "main";
   case Kind::KwVar: return "var";
   case Kind::KwLet: return "let";
