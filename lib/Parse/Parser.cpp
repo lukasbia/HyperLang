@@ -665,10 +665,11 @@ ast::ExpressionPtr Parser::parseRange() {
 ast::ExpressionPtr Parser::parseLogicalOr() {
   auto expression = parseLogicalAnd();
   while (at(tok::Kind::PipePipe)) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseLogicalAnd();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
@@ -676,10 +677,11 @@ ast::ExpressionPtr Parser::parseLogicalOr() {
 ast::ExpressionPtr Parser::parseLogicalAnd() {
   auto expression = parseEquality();
   while (at(tok::Kind::AmpersandAmpersand)) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseEquality();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
@@ -687,10 +689,11 @@ ast::ExpressionPtr Parser::parseLogicalAnd() {
 ast::ExpressionPtr Parser::parseEquality() {
   auto expression = parseComparison();
   while (at(tok::Kind::EqualEqual) || at(tok::Kind::NotEqual)) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseComparison();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
@@ -698,10 +701,11 @@ ast::ExpressionPtr Parser::parseEquality() {
 ast::ExpressionPtr Parser::parseComparison() {
   auto expression = parseTerm();
   while (precedence(current().kind) == 40) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseTerm();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
@@ -711,10 +715,11 @@ ast::ExpressionPtr Parser::parseTerm() {
   while (at(tok::Kind::Plus) || at(tok::Kind::Minus) ||
          at(tok::Kind::Pipe) || at(tok::Kind::Caret) ||
          at(tok::Kind::Ampersand)) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseFactor();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
@@ -723,10 +728,11 @@ ast::ExpressionPtr Parser::parseFactor() {
   auto expression = parseUnary();
   while (at(tok::Kind::Star) || at(tok::Kind::Slash) ||
          at(tok::Kind::Percent)) {
+    SourceLocation start = expression->range.start;
     tok::Kind op = consume().kind;
     auto rhs = parseUnary();
     expression = std::make_unique<ast::BinaryExpression>(
-        op, std::move(expression), std::move(rhs), rangeFrom(expression->range.start));
+        op, std::move(expression), std::move(rhs), rangeFrom(start));
   }
   return expression;
 }
