@@ -3,7 +3,7 @@
 #define HYPERLANG_DRIVER_TOOLCHAINS_H
 #include <memory>
 #include <string>
-#include "hyperlang/Driver/TargetInfo.h"
+#include "TargetInfo.h"
 namespace hyperlang::driver {
 class ToolChain {
 public:
