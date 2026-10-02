@@ -3,66 +3,23 @@
 #ifndef HYPERLANG_PARSE_LEXER_H
 #define HYPERLANG_PARSE_LEXER_H
 
+#include "hyperlang/Parse/LexerDiagnostics.h"
+#include "hyperlang/Parse/LexerKeywords.h"
+#include "hyperlang/Parse/LexerLiterals.h"
+#include "hyperlang/Parse/LexerOperators.h"
+#include "hyperlang/Parse/LexerOptions.h"
+#include "hyperlang/Parse/LexerToken.h"
+#include "hyperlang/Parse/LexerTrivia.h"
+#include "hyperlang/Parse/LexerUnicode.h"
 #include "hyperlang/Parse/TokenKinds.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace hyperlang {
-
-struct SourceLocation {
-  std::size_t offset = 0;
-  std::size_t line = 1;
-  std::size_t column = 1;
-};
-
-struct SourceRange {
-  SourceLocation start;
-  SourceLocation end;
-};
-
-struct Diagnostic {
-  enum class Severity { Note, Warning, Error };
-  Severity severity;
-  SourceLocation location;
-  std::string message;
-};
-
-struct Token {
-  tok::Kind kind = tok::Kind::Unknown;
-  SourceRange range{};
-  std::string_view text{};
-  std::string decodedText{};
-  std::uint64_t integerValue = 0;
-  double floatingValue = 0.0;
-  bool hasIntegerValue = false;
-  bool hasFloatingValue = false;
-
-  bool is(tok::Kind expected) const { return kind == expected; }
-  bool isIdentifier() const {
-    return kind == tok::Kind::Identifier ||
-           kind == tok::Kind::EscapedIdentifier;
-  }
-  bool isLiteral() const {
-    return kind == tok::Kind::IntegerLiteral ||
-           kind == tok::Kind::FloatingLiteral ||
-           kind == tok::Kind::StringLiteral ||
-           kind == tok::Kind::CharacterLiteral;
-  }
-};
-
-struct LexerOptions {
-  bool retainComments = false;
-  bool allowHashbang = true;
-  bool diagnoseUnknownCharacters = true;
-  bool allowEscapedIdentifiers = true;
-  bool allowUnicodeIdentifiers = true;
-  bool allowNestedBlockComments = true;
-};
 
 class Lexer {
 public:
@@ -77,7 +34,7 @@ public:
   bool atEnd() const;
   std::size_t offset() const;
   SourceLocation location() const;
-  const std::vector<Diagnostic> &diagnostics() const;
+  const DiagnosticList &diagnostics() const;
   bool hasErrors() const;
 
   void reset(std::size_t offset = 0);
@@ -95,7 +52,7 @@ private:
   std::size_t line_ = 1;
   std::size_t column_ = 1;
   std::optional<Token> lookahead_;
-  std::vector<Diagnostic> diagnostics_;
+  DiagnosticList diagnostics_;
 
   SourceLocation currentLocation() const;
   char currentByte() const;
@@ -104,11 +61,13 @@ private:
   void advanceBytes(std::size_t count);
   bool consumeIf(char ch);
 
-  void emit(Diagnostic::Severity severity, SourceLocation location, std::string message);
+  void emit(Diagnostic::Severity severity, SourceLocation location,
+            std::string message);
   void error(SourceLocation location, std::string message);
   void warning(SourceLocation location, std::string message);
 
-  Token makeToken(tok::Kind kind, std::size_t start, SourceLocation startLocation) const;
+  Token makeToken(tok::Kind kind, std::size_t start,
+                  SourceLocation startLocation) const;
   Token lexImpl();
 
   bool skipTrivia();
