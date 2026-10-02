@@ -1,6 +1,6 @@
 #ifndef HYPERLANG_DRIVER_JOB_H
 #define HYPERLANG_DRIVER_JOB_H
-#include "hyperlang/Driver/Action.h"
+#include "Action.h"
 #include <string>
 #include <utility>
 #include <vector>
