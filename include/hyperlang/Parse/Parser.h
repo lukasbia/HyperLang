@@ -21,6 +21,8 @@ private:
   Lexer lexer_;
   DiagnosticList diagnostics_;
   ParserDiagnostics parserDiagnostics_;
+  mutable std::size_t lexerDiagnosticsCount_ = 0;
+  void syncLexerDiagnostics() const;
   const Token &current();
   Token consume();
   bool at(tok::Kind k);
