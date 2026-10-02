@@ -205,6 +205,13 @@ void Parser::synchronizeToStatement() {
   }
 }
 
+ParserResult Parser::parse() {
+  ParserResult result;
+  result.sourceFile = parseSourceFile();
+  result.diagnostics = diagnostics_;
+  return result;
+}
+
 std::unique_ptr<ast::SourceFile> Parser::parseSourceFile() {
   auto file = std::make_unique<ast::SourceFile>();
   SourceLocation start = current().range.start;
