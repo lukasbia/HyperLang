@@ -19,6 +19,7 @@ enum class Mode {
 struct Options {
   Mode mode = Mode::Parse;
   std::string input;
+  std::string output;
 };
 
 void printUsage(std::ostream &out) {
@@ -34,6 +35,14 @@ bool parseOptions(int argc, char **argv, Options &options) {
     }
     if (argument == "--ast") {
       options.mode = Mode::AST;
+      continue;
+    }
+    if (argument == "-o") {
+      if (i + 1 >= argc) {
+        std::cerr << "hyperlangc: '-o' requires an output path\n";
+        return false;
+      }
+      options.output = argv[++i];
       continue;
     }
     if (argument == "--help" || argument == "-h") {
@@ -112,12 +121,23 @@ int runTokens(std::string_view source, std::string_view path) {
   return lexer.hasErrors() ? 1 : 0;
 }
 
-int runParser(std::string_view source, std::string_view path, bool dumpAST) {
+int runParser(std::string_view source, std::string_view path, bool dumpAST,
+              std::string_view outputPath) {
   hyperlang::Parser parser(source);
   hyperlang::ParserResult result = parser.parse();
 
-  if (dumpAST && result.sourceFile)
-    hyperlang::ast::dump(*result.sourceFile, std::cout);
+  if (dumpAST && result.sourceFile) {
+    if (outputPath.empty()) {
+      hyperlang::ast::dump(*result.sourceFile, std::cout);
+    } else {
+      std::ofstream output(std::string(outputPath), std::ios::binary);
+      if (!output) {
+        std::cerr << "hyperlangc: cannot create '" << outputPath << "'\n";
+        return 1;
+      }
+      hyperlang::ast::dump(*result.sourceFile, output);
+    }
+  }
 
   printDiagnostics(result.diagnostics, path);
   return result.hasErrors() ? 1 : 0;
@@ -143,5 +163,6 @@ int main(int argc, char **argv) {
   if (options.mode == Mode::Tokens)
     return runTokens(source, options.input);
 
-  return runParser(source, options.input, options.mode == Mode::AST);
+  return runParser(source, options.input, options.mode == Mode::AST,
+                    options.output);
 }
