@@ -1,7 +1,7 @@
 #ifndef HYPERLANG_DRIVER_DRIVER_H
 #define HYPERLANG_DRIVER_DRIVER_H
-#include "hyperlang/Driver/Compilation.h"
-#include "hyperlang/Driver/TargetInfo.h"
+#include "Compilation.h"
+#include "TargetInfo.h"
 #include <memory>
 #include <string>
 #include <vector>
