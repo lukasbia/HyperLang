@@ -3,6 +3,7 @@
 #include "hyperlang/Parse/AST.h"
 #include "hyperlang/Parse/Lexer.h"
 #include "hyperlang/Parse/ParserDiagnostics.h"
+#include "hyperlang/Parse/ParserResult.h"
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -12,6 +13,7 @@ class Parser {
 public:
   explicit Parser(std::string_view source, LexerOptions options = {});
   std::unique_ptr<ast::SourceFile> parseSourceFile();
+  ParserResult parse();
   const DiagnosticList &diagnostics() const;
   bool hasErrors() const;
   std::size_t offset() const;
