@@ -192,10 +192,100 @@ constexpr std::uint64_t identifierHash(std::string_view value) noexcept {
   return hash;
 }
 
+constexpr bool isASCIIWhitespaceExtended(char ch) noexcept {
+  switch (ch) {
+  case ' ': case '\t': case '\n': case '\r': case '\v': case '\f':
+    return true;
+  default:
+    return false;
+  }
+}
+
+constexpr bool isLineTerminatorExtended(char ch) noexcept {
+  return ch == '\n' || ch == '\r';
+}
+
+constexpr bool isPunctuationCharacter(char ch) noexcept {
+  switch (ch) {
+  case '+': case '-': case '*': case '/': case '%':
+  case '=': case '!': case '<': case '>': case '&':
+  case '|': case '^': case '~': case '?': case '.':
+  case ':': case ',': case ';': case '(': case ')':
+  case '{': case '}': case '[': case ']': case '\\': case '#':
+    return true;
+  default:
+    return false;
+  }
+}
+
+bool hasBadNumericSeparators(std::string_view text) noexcept {
+  if (text.empty())
+    return false;
+  if (text.front() == '_' || text.back() == '_')
+    return true;
+  for (std::size_t i = 1; i < text.size(); ++i)
+    if (text[i] == '_' && text[i - 1] == '_')
+      return true;
+  return false;
+}
+
+bool isSingleUnicodeScalar(std::string_view text) noexcept {
+  if (text.empty())
+    return false;
+  std::size_t offset = 0;
+  unsigned count = 0;
+  while (offset < text.size()) {
+    const unicode::DecodeResult result = unicode::decode(text, offset);
+    if (!result.valid)
+      return false;
+    offset += result.width;
+    ++count;
+  }
+  return count == 1;
+}
+
+std::string hexByte(unsigned char value) {
+  static constexpr char digits[] = "0123456789ABCDEF";
+  std::string result = "0x";
+  result += digits[value >> 4];
+  result += digits[value & 0x0F];
+  return result;
+}
+
+bool isUnicodeIdentifierStartForLexer(std::string_view source,
+                                      std::size_t offset) noexcept {
+  const unicode::DecodeResult result = unicode::decode(source, offset);
+  return result.valid && unicode::isIdentifierStart(result.codePoint);
+}
+
+bool isUnicodeIdentifierContinueForLexer(std::string_view source,
+                                         std::size_t offset) noexcept {
+  const unicode::DecodeResult result = unicode::decode(source, offset);
+  return result.valid && unicode::isIdentifierContinue(result.codePoint);
+}
+
+bool isUnicodeWhitespaceForLexer(std::string_view source,
+                                 std::size_t offset) noexcept {
+  const unicode::DecodeResult result = unicode::decode(source, offset);
+  return result.valid && unicode::isWhitespace(result.codePoint);
+}
+
+bool isCommentStart(std::string_view source, std::size_t offset) noexcept {
+  return offset + 1 < source.size() && source[offset] == '/' &&
+         (source[offset + 1] == '/' || source[offset + 1] == '*');
+}
+
+bool isHashbang(std::string_view source) noexcept {
+  return source.size() >= 2 && source[0] == '#' && source[1] == '!';
+}
 } // namespace
 
 Lexer::Lexer(std::string_view source, LexerOptions options)
-    : source_(source), options_(options) {}
+    : source_(source), options_(options) {
+  // HyperLang source is UTF-8. A BOM is accepted only at the beginning of the
+  // buffer and is treated as source metadata rather than a token.
+  consumeUTF8BOM();
+}
 
 SourceLocation Lexer::currentLocation() const {
   return {cursor_, line_, column_};
@@ -1222,6 +1312,10 @@ Token Lexer::lexNumber() {
 
   scanFloatSuffix();
 
+  const std::string_view literal = source_.substr(start, cursor_ - start);
+  if (hasBadNumericSeparators(literal))
+    error(loc, "invalid placement of numeric separator");
+
   Token token = makeToken(
       floating ? tok::Kind::FloatingLiteral : tok::Kind::IntegerLiteral,
       start, loc);
@@ -1424,6 +1518,9 @@ Token Lexer::lexCharacter() {
   if (!consumeIf(static_cast<char>(39)))
     error(loc, "unterminated character literal");
 
+  if (!isSingleUnicodeScalar(value))
+    error(loc, "character literal must contain exactly one Unicode scalar");
+
   Token token = makeToken(tok::Kind::CharacterLiteral, start, loc);
   token.decodedText = std::move(value);
   return token;
@@ -1523,6 +1620,115 @@ bool Lexer::skipTrivia() {
   return consumed;
 }
 
+bool Lexer::isAtLineStart() const {
+  return column_ == 1;
+}
+
+bool Lexer::consumeUTF8BOM() {
+  if (cursor_ != 0 || source_.size() < 3)
+    return false;
+  if (static_cast<unsigned char>(source_[0]) != 0xEF ||
+      static_cast<unsigned char>(source_[1]) != 0xBB ||
+      static_cast<unsigned char>(source_[2]) != 0xBF)
+    return false;
+  cursor_ = 3;
+  line_ = 1;
+  column_ = 1;
+  return true;
+}
+
+bool Lexer::scanUTF8CodePoint() {
+  if (atEnd())
+    return false;
+  const unicode::DecodeResult result = unicode::decode(source_, cursor_);
+  if (!result.valid) {
+    const SourceLocation loc = currentLocation();
+    const unsigned char byte = static_cast<unsigned char>(currentByte());
+    error(loc, "invalid UTF-8 byte " + hexByte(byte));
+    advanceByte();
+    return false;
+  }
+  advanceBytes(result.width);
+  return true;
+}
+
+bool Lexer::skipHorizontalWhitespace() {
+  bool consumed = false;
+  for (;;) {
+    if (atEnd())
+      break;
+    const unsigned char byte = static_cast<unsigned char>(currentByte());
+    if (byte < 0x80u) {
+      if (currentByte() == ' ' || currentByte() == '\t' ||
+          currentByte() == '\v' || currentByte() == '\f') {
+        advanceByte();
+        consumed = true;
+        continue;
+      }
+      break;
+    }
+    if (!isUnicodeWhitespaceForLexer(source_, cursor_))
+      break;
+    const unicode::DecodeResult result = unicode::decode(source_, cursor_);
+    advanceBytes(result.width);
+    consumed = true;
+  }
+  return consumed;
+}
+
+Token Lexer::makeEOFToken() const {
+  Token token;
+  token.kind = tok::Kind::EndOfFile;
+  token.range.start = currentLocation();
+  token.range.end = currentLocation();
+  return token;
+}
+
+Token Lexer::lexComment() {
+  const std::size_t start = cursor_;
+  const SourceLocation loc = currentLocation();
+
+  if (currentByte() == '/' && peekByte() == '/') {
+    advanceBytes(2);
+    while (!atEnd() && currentByte() != '\n' && currentByte() != '\r')
+      advanceByte();
+    Token token = makeToken(tok::Kind::Comment, start, loc);
+    token.decodedText = std::string(source_.substr(start + 2,
+                                             cursor_ - start - 2));
+    return token;
+  }
+
+  advanceBytes(2);
+  unsigned depth = 1;
+  while (!atEnd()) {
+    if (options_.allowNestedBlockComments &&
+        currentByte() == '/' && peekByte() == '*') {
+      ++depth;
+      advanceBytes(2);
+      continue;
+    }
+    if (currentByte() == '*' && peekByte() == '/') {
+      advanceBytes(2);
+      if (--depth == 0)
+        break;
+      continue;
+    }
+    if (!scanUTF8CodePoint())
+      continue;
+  }
+
+  if (depth != 0)
+    error(loc, "unterminated block comment");
+
+  const std::size_t contentStart = start + 2;
+  const std::size_t contentEnd =
+      cursor_ >= 2 && source_[cursor_ - 2] == '*' &&
+      source_[cursor_ - 1] == '/' ? cursor_ - 2 : cursor_;
+  Token token = makeToken(tok::Kind::Comment, start, loc);
+  token.decodedText = std::string(
+      source_.substr(contentStart, contentEnd - contentStart));
+  return token;
+}
 Token Lexer::lexSlash() {
   const std::size_t start = cursor_;
   const SourceLocation loc = currentLocation();
@@ -1739,40 +1945,53 @@ Token Lexer::lexUnknown() {
 Token Lexer::lexImpl() {
   skipTrivia();
 
-  if (atEnd()) {
-    Token token;
-    token.kind = tok::Kind::EndOfFile;
-    token.range.start = currentLocation();
-    token.range.end = currentLocation();
-    return token;
+  if (atEnd())
+    return makeEOFToken();
+
+  if (options_.retainComments && isCommentStart(source_, cursor_))
+    return lexComment();
+
+  const std::size_t tokenOffset = cursor_;
+  const SourceLocation tokenLocation = currentLocation();
+  const unsigned char byte = static_cast<unsigned char>(currentByte());
+
+  switch (currentByte()) {
+  case '\0':
+    error(tokenLocation, "embedded null character in source");
+    advanceByte();
+    return makeToken(tok::Kind::Unknown, tokenOffset, tokenLocation);
+  case '@':
+    return lexAttributedName();
+  case '`':
+    if (options_.allowEscapedIdentifiers)
+      return lexEscapedIdentifier();
+    return lexUnknown();
+  case '"':
+    return lexString();
+  case '\'':
+    return lexCharacter();
+  default:
+    break;
   }
 
-  const char ch = currentByte();
-
-  if (isAsciiIdentifierStart(ch) ||
-      (options_.allowUnicodeIdentifiers &&
-       static_cast<unsigned char>(ch) >= 0x80u))
-    return lexIdentifierOrKeyword();
-
-  if (ch == static_cast<char>(96) && options_.allowEscapedIdentifiers)
-    return lexEscapedIdentifier();
-
-  if (ch == '@')
-    return lexAttributedName();
-
-  if (ch >= '0' && ch <= '9')
+  if (isASCIIDigit(currentByte()))
     return lexNumber();
 
-  if (ch == '"')
-    return lexString();
+  if (isAsciiIdentifierStart(currentByte()))
+    return lexIdentifierOrKeyword();
 
-  if (ch == static_cast<char>(39))
-    return lexCharacter();
+  if (options_.allowUnicodeIdentifiers && byte >= 0x80u) {
+    const unicode::DecodeResult result = unicode::decode(source_, cursor_);
+    if (!result.valid) {
+      error(tokenLocation, "invalid UTF-8 sequence in source");
+      advanceByte();
+      return makeToken(tok::Kind::Unknown, tokenOffset, tokenLocation);
+    }
+    if (unicode::isIdentifierStart(result.codePoint))
+      return lexIdentifierOrKeyword();
+  }
 
-  if (isOperatorCharacter(ch) || ch == '.' || ch == ':' ||
-      ch == ',' || ch == ';' || ch == '(' || ch == ')' ||
-      ch == '{' || ch == '}' || ch == '[' || ch == ']' ||
-      ch == '\\' || ch == '#')
+  if (isPunctuationCharacter(currentByte()))
     return lexOperatorOrPunctuation();
 
   return lexUnknown();
