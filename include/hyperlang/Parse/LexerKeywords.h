@@ -11,16 +11,6 @@
 
 namespace hyperlang::lexer {
 
-struct KeywordEntry {
-  std::string_view spelling;
-  tok::Kind kind;
-};
-
-struct AttributeEntry {
-  std::string_view spelling;
-  tok::Kind kind;
-};
-
 constexpr std::uint64_t identifierHash(std::string_view value) noexcept {
   std::uint64_t hash = 0xcbf29ce484222325ULL;
   for (unsigned char byte : value) {
@@ -29,6 +19,20 @@ constexpr std::uint64_t identifierHash(std::string_view value) noexcept {
   }
   return hash;
 }
+
+struct KeywordEntry {
+  std::string_view spelling;
+  tok::Kind kind;
+  std::uint64_t hash;
+
+  constexpr KeywordEntry(std::string_view value, tok::Kind tokenKind)
+      : spelling(value), kind(tokenKind), hash(identifierHash(value)) {}
+};
+
+struct AttributeEntry {
+  std::string_view spelling;
+  tok::Kind kind;
+};
 
 inline constexpr std::array<KeywordEntry, 137> KeywordTable = {{
   {"func", tok::Kind::KwFunc},
@@ -191,7 +195,7 @@ inline constexpr std::array<AttributeEntry, 15> AttributeTable = {{
 constexpr bool isKeywordSpelling(std::string_view spelling) noexcept {
   const std::uint64_t hash = identifierHash(spelling);
   for (const KeywordEntry &entry : KeywordTable)
-    if (identifierHash(entry.spelling) == hash && entry.spelling == spelling)
+    if (entry.hash == hash && entry.spelling == spelling)
       return true;
   return false;
 }
